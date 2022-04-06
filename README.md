@@ -16,6 +16,34 @@
    9. [Branch integration (merge & rebase)](#merge-rebase)
 3. [Working with remotes](#remotes)
 ----
+## 0. Cheatsheet
+We use some [mermaid] graphs, only visible in GitHub (you will see only code in local)
+<!--https://mermaid-js.github.io/mermaid-live-editor-->
+```mermaid
+sequenceDiagram
+    participant w as Working directory
+    participant s as Staging area
+    participant l as Local repository
+    participant r as Remote repository
+    w->>s: git add
+    s->>l: git commit
+    l->>l: git tag
+    rect rgb(191, 223, 255)
+    l->>l: git branch
+    r->>l: git branch
+    end
+    l->>r: git push
+    r->>l: git fetch
+    rect rgb(191, 223, 255)
+    l->>w: git checkout
+    r->>w: git checkout
+    end
+    rect rgb(191, 223, 255)
+    l->>w: git reset
+    r->>w: git reset
+    end
+    # Note over w, r: You can also create a branch, checkout or reset from remote
+```
 
 ## 1. Setting your environment<a name="settings"></a>
 ![](resources/icons/docker.png)
@@ -24,11 +52,10 @@ We will use docker, so we can have the same isolated environment:
 ```bash
 cd docker/
 docker build -t training/git .
-mkdir -p /Users/eruizalo/git_docker2/
 docker run -it -d -v $(pwd)/git-volume/:/root/projects/ --name learning-git training/git:latest
-docker exec -it git bash
+docker exec -it learning-git bash
 ```
-Now, inside your docker, got to **projects** folder: `cd projects`
+Now, inside your docker, got to **projects/local** folder: `cd projects/local`
 
 ----
 
@@ -36,6 +63,13 @@ Now, inside your docker, got to **projects** folder: `cd projects`
 
 ### 2.1 Starting with git<a name="starting"></a>
 ![](resources/icons/config.png)
+
+
+<details>
+<summary>Command summary</summary>
+Let's see [git config] command
+</details>
+
 ```bash
 ls -l
 # We should have an empty folder, create a new one if you want
@@ -84,8 +118,10 @@ git status -u -s
 echo "secrets/*" >> .gitignore
 git status
 git commit -am "gitignore"
+```
 
-# What if I am already tracking a file I do not want to track?
+What if I am already tracking a file I do not want to track?
+```bash
 touch script.sh
 git add .
 git commit -m "add script"
@@ -225,6 +261,31 @@ git reset --hard <COMMIT ID DELETED BRANCH>
 git logtree
 ```
 
+```mermaid
+sequenceDiagram
+    participant w as Working directory
+    participant s as Staging area
+    participant r as Local/Remote repository
+    rect rgb(191, 223, 255)
+    note over w,r: git reset --soft
+    r->>s: download/delete + stage
+    s->>s: remain
+    w->>w: remain
+    end
+    rect rgb(191, 223, 255)
+    note over w,r: git reset --mixed
+    r->>w: download/delete + unstage
+    s->>w: unstage
+    w->>w: remain
+    end
+    rect rgb(191, 223, 255)
+    r->>w: download/delete
+    s--xw: unstage + delete
+    w--xw: delete
+    note right of w: untracked files will remain
+    end
+```
+
 ### 2.7 Amending<a name="amending"></a>
 ![](resources/icons/amend.png)
 ```bash
@@ -301,7 +362,113 @@ git rebase -i main		### PICK + SQUASH
 git logtree
 ```
 
+Initial
+```mermaid
+gitGraph:
+options
+{
+    "nodeSpacing": 100,
+    "nodeRadius": 5
+}
+end
+commit
+branch newbranch
+checkout newbranch
+commit
+commit
+checkout master
+commit
+commit
+```
+
+Merge:
+```mermaid
+gitGraph:
+options
+{
+    "nodeSpacing": 100,
+    "nodeRadius": 5
+}
+end
+commit
+branch newbranch
+checkout newbranch
+commit
+commit
+checkout master
+commit
+commit
+checkout newbranch
+merge master
+commit
+```
+
+```mermaid
+gitGraph:
+options
+{
+    "nodeSpacing": 100,
+    "nodeRadius": 5
+}
+end
+commit
+commit
+commit
+branch newbranch
+checkout newbranch
+commit
+commit
+commit
+```
+
 ----
 ----
 ## 3. Working with remotes<a name="remotes"></a>
 ![](resources/icons/github.png)![](resources/icons/gitlab.png)![](resources/icons/bitbucket.png)
+
+1. Go to **projects/remotes** folder: `cd ~/projects`
+2. Clone the repo: `git clone https://github.com/eruizalo/git-learning.git`
+   1. This will have downloaded all the git history of this repository in a **new folder**
+3. Go to the new folder: `cd git-learning`
+4. Check our remotes: `git remote`
+4. Let's see a bit more: `git remote show origin`
+
+### 3.1 Fetching + sync main<a name="fetching"></a>
+
+### 3.2 Multiple remotes (forking)<a name="forking"></a>
+
+### 3.3 Working with others<a name="pull-push"></a>
+
+### 3.4 Force push<a name="force-push"></a>
+
+### 3.5 Tracking your branches<a name="tracking-branches"></a>
+```bash
+# rename a pushed branch
+# push branch 1 (local) to branch 2 (remote)
+```
+
+### 3.6 Pull Requests (PRs)<a name="force-push"></a>
+
+
+[mermaid]: https://mermaid-js.github.io/
+[git config]: https://git-scm.com/docs/git-config
+[git init]: https://git-scm.com/docs/git-init
+[git commit]: https://git-scm.com/docs/git-commit
+[git add]: https://git-scm.com/docs/git-add
+[git status]: https://git-scm.com/docs/git-status
+[git checkout]: https://git-scm.com/docs/git-checkout
+[git rm]: https://git-scm.com/docs/git-rm
+[git config alias]: https://git-scm.com/book/en/v2/Git-Basics-Git-Aliases
+[git reset]: https://git-scm.com/docs/git-reset
+[git log]: https://git-scm.com/docs/git-log
+[git branch]: https://git-scm.com/docs/git-branch
+[git merge]: https://git-scm.com/docs/git-merge
+[git tag]: https://git-scm.com/docs/git-tag
+[git stash]: https://git-scm.com/docs/git-stash
+[git revert]: https://git-scm.com/docs/git-revert
+[git cherry-pick]: https://git-scm.com/docs/git-cherry-pick
+[git rebase]: https://git-scm.com/docs/git-rebase
+[git clone]: https://git-scm.com/docs/git-clone
+[git remote]: https://git-scm.com/docs/git-remote
+[git fetch]: https://git-scm.com/docs/git-fetch
+[git push]: https://git-scm.com/docs/git-push

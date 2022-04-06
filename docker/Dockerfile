@@ -8,5 +8,5 @@ RUN apt-get -y update && \
 COPY bashrc /root/.bashrc
 COPY bash_git /root/.bash_git
 
-RUN mkdir ~/projects && \
+RUN mkdir -p ~/projects/local && \
 	ln -s ~/projects projects

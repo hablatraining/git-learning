@@ -3,23 +3,25 @@
 
 ----
 # Table of Contents
-1. [Setting your environment](#settings)
-2. [Working locally](#local)
-   1. [Starting with git](#starting)
-   2. [Tracking files](#tracking-files)
-   3. [Log & alias](#log-alias)
-   4. [HEAD, relative references & branch creation and repositioning](#head-branching)
-   5. [Stashing](#stashing)
-   6. [Rollback changes](#rollback)
-   7. [Amending](#amending)
-   8. [Cherry picking](#cherry-picking)
-   9. [Branch integration (merge & rebase)](#merge-rebase)
-3. [Working with remotes](#remotes)
-   2. [Working with others 1 (fetching)](#fetching)
-   1. [Working with others 2 (pull-push)](#pull-push)
-   3. [Force push](#force-push)
-   4. [Tracking your branches](#tracking-branches)
-   5. [Pull Requests (PRs)](#prs)
+1. [Setting your environment](#1-setting-your-environment)
+2. [Working locally](#2-working-locally)
+   1. [Starting with git](#21-starting-with-git)
+   2. [Tracking files](#22-tracking-files)
+   3. [Log & alias](#23-log--alias)
+   4. [HEAD, relative references & branch creation and repositioning](#24-head-relative-references--branch-creation-and-repositioning)
+   5. [Stashing](#25-stashing)
+   6. [Rollback changes](#26-rollback-changes)
+   7. [Amending](#27-amending)
+   8. [Cherry picking](#28-cherry-picking)
+   9. [Branch integration (merge & rebase)](#29-branch-integration-merge--rebase)
+3. [Working with remotes](#3-working-with-remotes)
+   1. [Cloning a remote repository](#31-cloning-a-remote-repository)
+   2. [Working with others 1 (fetching)](#32-working-with-others-1-fetching)
+   3. [Working with others 2 (pull-push)](#33-working-with-others-2-pull-push)
+   4. [Multiple remotes (forking)](#34-multiple-remotes-forking)
+   5. [Force push](#35-force-push)
+   6. [Tracking your branches](#36-tracking-your-branches)
+   7. [Pull Requests (PRs)](#37-pull-requests-prs)
 ----
 ## 0. Cheatsheet
 We use some [mermaid] graphs, only visible in GitHub (you will see only code in local)
@@ -50,38 +52,104 @@ sequenceDiagram
     # Note over w, r: You can also create a branch, checkout or reset from remote
 ```
 
-## 1. Setting your environment<a name="settings"></a>
+## 1. Setting your environment
 ![](resources/icons/docker.png)
 
-We will use [docker],[^docker] so we can have the same isolated environment:
+We will use [docker][^docker] so we can have the same isolated environment:
 ```bash
 cd docker/
 docker build -t training/git .
+# If you are not familiar with docker, -v will create a volume inside the docker directory.
+#     Whatever you create inside your docker container at projects folder will be at this volume too,
+#     so you can see your files and repos from your computer or git clients.
+# You may want to delete this argument or change it according your needs.
 docker run -it -d -v $(pwd)/git-volume/:/root/projects/ --name learning-git training/git:latest
+# Use this command to "enter" your docker container whenever you want
 docker exec -it learning-git bash
 ```
 Now, inside your docker, got to **projects/local** folder: `cd projects/local`
 
+> **Note:** Each section will have a synopsis (ℹ️⚡ℹ️) of the commands with some useful arguments.
+> However, there are more arguments, for more information visit the links of each command.
 ----
 
-## 2. Working locally<a name="local"></a>
+## 2. Working locally
 
-### 2.1 Starting with git<a name="starting"></a>
+### 2.1 Starting with git
 ![](resources/icons/config.png)
 
-Let's see [git config] command
-<details>
-<summary>Command log</summary>
+<details><summary>ℹ️⚡ℹ️ Synopsis</summary>
+
+```bash
+git config [--<scope>] [--show-origin] <name> [<value> [<value-pattern>]]
+git config [--<scope>] --add <name> <value>
+git config [--<scope>] --unset <name> [<value-pattern>]
+git config [--show-origin] [--show-scope] -l | --list
+git config [--<scope>] -e | --edit
+```
+</details>
+
+The [git config] command let us add, remove and show some configurations to customize the way you work with git.
+We will also see the following commands to begin with git:
+1. The [git init] command creates an empty local git repository
+
+<details><summary>ℹ️⚡ℹ️ Synopsis</summary>
+
+```bash
+git init [-b <branch-name> | --initial-branch=<branch-name>]
+         [<directory>]
+```
+</details>
+
+2. The [git add] command updates the internal git index so the given files will be tracked and prepared to be "committed". A file that has being "added" is also known as a staged file.
+
+<details><summary>ℹ️⚡ℹ️ Synopsis</summary>
+
+```bash
+git add [--verbose | -v] [--dry-run | -n] [--force | -f] [--interactive | -i] [--patch | -p]
+        [--edit | -e] [--[no-]all | --[no-]ignore-removal | [--update | -u]] [--sparse]
+        [--intent-to-add | -N] [--refresh] [--ignore-errors] [--ignore-missing] [--renormalize]
+        [--chmod=(+|-)x] [--pathspec-from-file=<file> [--pathspec-file-nul]]
+        [--] [<pathspec>...]
+```
+</details>
+
+3. The [git commit] command is the one which actually saves the **staged** files.
+When you create a new commit you will save the following info among others:
+  * The actual changes (only the differences)
+  * Who performed the commit
+  * When the commit was created
+  * The commit parent
+  * etc
+
+<details><summary>ℹ️⚡ℹ️ Synopsis</summary>
+
+```bash
+git commit [-a | --interactive | --patch] [-s] [-v] [-u<mode>] [--amend]
+           [--dry-run] [(-c | -C | --squash) <commit> | --fixup [(amend|reword):]<commit>)]
+           [-F <file> | -m <msg>] [--reset-author] [--allow-empty]
+           [--allow-empty-message] [--no-verify] [-e] [--author=<author>]
+           [--date=<date>] [--cleanup=<mode>] [--[no-]status]
+           [-i | -o] [--pathspec-from-file=<file> [--pathspec-file-nul]]
+           [--] [<pathspec>...]
+```
+</details><br>
+
+<details><summary>🚧Let's practice</summary>
 
 ```bash
 ls -l
-# We should have an empty folder, create a new one if you want
-git config --global init.defaultBranch main
+# First of all, let's say to git who we are and which name should it display
 git config --global user.email eduardo.ruiz@hablapps.com
 git config --global user.name "Eduardo Ruiz Alonso"
 
+# We can view all the configs anytime
 git config --list
 
+# There are some other interesting configs, you will see its potential eventually
+git config --global init.defaultBranch main
+
+# Now that git has the minimum configuration, let's start a project
 git init
 echo -e "# This is my git project\n" > README.md
 echo -e "Cheatsheet: https://devhints.io/git-log-format\n\n" >> README.md
@@ -95,10 +163,16 @@ git config --list --show-origin
 ```
 </details>
 
-### 2.2 Tracking files<a name="tracking-files"></a>
+### 2.2 Tracking files
 ![](resources/icons/track.png)
-<details>
-<summary>Command log</summary>
+
+<details><summary>ℹ️⚡ℹ️ Synopsis</summary>
+
+</details>
+
+The [git status] command TODO
+
+<details><summary>🚧Let's practice</summary>
 
 ```bash
 echo "this is a test" > test.txt
@@ -129,8 +203,7 @@ git commit -am "gitignore"
 </details>
 
 What if I am already tracking a file I do not want to track?
-<details>
-<summary>Command log</summary>
+<details><summary>🚧Let's practice</summary>
 
 ```bash
 touch script.sh
@@ -150,9 +223,15 @@ git status
 ```
 </details>
 
-### 2.3 Log & alias<a name="log-alias"></a>
-<details>
-<summary>Command log</summary>
+### 2.3 Log & alias
+
+<details><summary>ℹ️⚡ℹ️ Synopsis</summary>
+
+</details>
+
+The [git log] command
+
+<details><summary>🚧Let's practice</summary>
 
 st=status -sb
 recent = branch --format='%(HEAD) %(color:yellow)%(refname:short)%(color:reset) - %(contents:subject) %(color:green)(%(committerdate:relative)) [%(authorname)]' --sort=-committerdate
@@ -179,10 +258,16 @@ git logtree
 ```
 </details>
 
-### 2.4 HEAD, relative references & branch creation and repositioning<a name="head-branching"></a>
+### 2.4 HEAD, relative references & branch creation and repositioning
 ![](resources/icons/branch.png)
-<details>
-<summary>Command log</summary>
+
+<details><summary>ℹ️⚡ℹ️ Synopsis</summary>
+
+</details>
+
+The [git diff] command TODO
+
+<details><summary>🚧Let's practice</summary>
 
 git diff HEAD^
 
@@ -226,10 +311,16 @@ git logtree
 ```
 </details>
 
-### 2.5 Stashing<a name="stashing"></a>
+### 2.5 Stashing
 ![](resources/icons/stash.png)
-<details>
-<summary>Command log</summary>
+
+<details><summary>ℹ️⚡ℹ️ Synopsis</summary>
+
+</details>
+
+The [git checkout] command
+
+<details><summary>🚧Let's practice</summary>
 
 ```bash
 git checkout -b feature/myFeature
@@ -258,10 +349,16 @@ git stash show -p
 ```
 </details>
 
-### 2.6 Rollback changes<a name="rollback"></a>
+### 2.6 Rollback changes
 ![](resources/icons/rollback.png)
-<details>
-<summary>Command log</summary>
+
+<details><summary>ℹ️⚡ℹ️ Synopsis</summary>
+
+</details>
+
+The [git revert] command TODO
+
+<details><summary>🚧Let's practice</summary>
 
 ```bash
 echo -e "\n\nthis will not fail\n" >> README.md
@@ -340,10 +437,12 @@ sequenceDiagram
     end
 ```
 
-### 2.7 Amending<a name="amending"></a>
+### 2.7 Amending
 ![](resources/icons/amend.png)
-<details>
-<summary>Command log</summary>
+
+Previously we saw the [git commit] command TODO
+
+<details><summary>🚧Let's practice</summary>
 
 ```bash
 echo -e "\nDis is som text\n" >> README.md
@@ -361,10 +460,16 @@ git log --pretty=fuller -n 2
 ```
 </details>
 
-### 2.8 Cherry picking<a name="cherry-picking"></a>
+### 2.8 Cherry picking
 ![](resources/icons/cherrypick.png)
-<details>
-<summary>Command log</summary>
+
+<details><summary>ℹ️⚡ℹ️ Synopsis</summary>
+
+</details>
+
+The [git cherry-pick] command TODO
+
+<details><summary>🚧Let's practice</summary>
 
 ```bash
 git checkout -b feature/myOtherFeature main
@@ -409,10 +514,22 @@ flowchart BT
     end
 ```
 
-### 2.9 Branch integration (merge & rebase)<a name="merge-rebase"></a>
+### 2.9 Branch integration (merge & rebase)
 ![](resources/icons/branch_compare.png)
-<details>
-<summary>Command log</summary>
+
+<details><summary>ℹ️⚡ℹ️ Synopsis</summary>
+
+</details>
+
+The [git merge] command TODO
+
+<details><summary>ℹ️⚡ℹ️ Synopsis</summary>
+
+</details>
+
+The [git rebase] command TODO
+
+<details><summary>🚧Let's practice</summary>
 
 ```bash
 git checkout feature/myOtherFeature
@@ -504,24 +621,30 @@ commit
 
 ----
 ----
-## 3. Working with remotes<a name="remotes"></a>
+## 3. Working with remotes
 ![](resources/icons/github.png)![](resources/icons/gitlab.png)![](resources/icons/bitbucket.png)
+
 In this section we will see how to work in a team using git.
 
 ### 3.1 Cloning a remote repository
-ℹ️⚡ℹ️
+
+<details><summary>ℹ️⚡ℹ️ Synopsis</summary>
+
 ```bash
 git clone [-v | --verbose] [-l | --local]
           [--depth <depth>] [--[no-]single-branch] [--no-tags]
           [-o | --origin <name>] [-b | --branch <name>]
           [--] <repository> [<directory>]
 ```
+</details>
+
 The [git clone] command copies a repository into a new directory.
 This is commonly used at the beginning of a project or at CI/CD[^CI/CD] pipelines.
 
 We will also take a look at [git remote] command, which let us manage links between local and remote repositories.
 
-ℹ️⚡ℹ️
+<details><summary>ℹ️⚡ℹ️ Synopsis</summary>
+
 ```bash
 git remote [-v | --verbose]
 git remote add [-t <branch>] [-f] [--[no-]tags] <name> <URL>
@@ -531,6 +654,7 @@ git remote set-url --add [--push] <name> <newurl>
 git remote set-url --delete [--push] <name> <URL>
 git remote [-v | --verbose] show [-n] <name>...
 ```
+</details>
 
 Let's clone this very same repo and see the firsts commands we can use while working int a team.
 
@@ -547,38 +671,45 @@ git remote show origin
 > ⚠️⚠️ **GitHub support for password authentication was removed on August 13, 2021.**:
 > Let's create a Personal Token Access (PAT) following the [official documentation](https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/creating-a-personal-access-token)
 
-### 3.1 Working with others 1 (fetching)<a name="fetching"></a>
-ℹ️⚡ℹ️
+### 3.2 Working with others 1 (fetching)
+<details><summary>ℹ️⚡ℹ️ Synopsis</summary>
+
 ```bash
 git fetch [--all] [-v | --verbose]
          [--no-commit] [-e | --edit] [--ff-only]
          [--squash] [--autostash]
          [<repository> [<refspec>...]]
 ```
+</details>
+
+The [git fetch] command TODO
+
+<details><summary>🚧Let's practice</summary>
+
 ```bash
 # Speaker will create a new branch & push a new commit
 git branch
 git branch -a
 ```
 
-
-
 ```bash
 backup = !f() { git branch --verbose backup/$(git branch --show-current)/$(date +'%Y%m%d_%H%M%S') && echo Backup created: backup/$(git branch --show-current)/$(date +'%Y%m%d_%H%M%S');}; f
 git checkout -b backup/$(git rev-parse --abbrev-ref HEAD)
 ```
+</details>
 
 > 🎁♻️ **_Cool alias:_**  `git config --global alias.sync = fetch origin main:main`
 
+### 3.3 Working with others 2 (pull-push)
+<details><summary>ℹ️⚡ℹ️ Synopsis</summary>
 
-### 3.2 Working with others 2 (pull-push)<a name="pull-push"></a>
-ℹ️⚡ℹ️
 ```bash
 git pull [--tags] [-v | --verbose]
          [--no-commit] [-e | --edit] [--ff-only]
          [--squash] [--autostash]
          [<repository> [<refspec>...]]
 ```
+</details>
 
 The _[git pull]_ command is used to sync and download content from a remote repository.
 Under the hood, `git pull` is a making the following steps for you:
@@ -593,6 +724,7 @@ flowchart LR
    B --- C
    C --- E
    E --- F[F,\n origin/main]
+   B -.-> |pull|F
 ```
 After:
 ```mermaid
@@ -601,7 +733,7 @@ flowchart LR
    B --- C
    C --- E
    E --- F[F,\n origin/main,\n main]
-   F -.-> |pull|F
+   B -.-> |pull|F
 ```
 
 But, what would have happened if you have been working over your main branch, or you are on another branch, and you want to "sync" it with main
@@ -616,34 +748,40 @@ flowchart LR
    F -.-> |pull|H
 ```
 
-<details>
-<summary>Command log</summary>
+<details><summary>🚧Let's practice</summary>
 
 ```bash
 # --> Download develop changes only if your develop hasn't changed
 git pull --ff-only origin main
 ```
-</details>
+</details><br>
 
-ℹ️⚡ℹ️
+<details><summary>ℹ️⚡ℹ️ Synopsis</summary>
+
 ```bash
 git push [--tags] [--porcelain] [-v | --verbose]
          [-f | --force] [-d | --delete]
          [<repository> [<refspec>...]]
 ```
+</details>
 
+The [git push] command TODO
 
-### 3.3 Multiple remotes (forking)<a name="forking"></a>
+<details><summary>🚧Let's practice</summary>
 
-### 3.4 Force push<a name="force-push"></a>
+</details>
 
-### 3.5 Tracking your branches<a name="tracking-branches"></a>
+### 3.4 Multiple remotes (forking)
+
+### 3.5 Force push
+
+### 3.6 Tracking your branches
 ```bash
 # rename a pushed branch
 # push branch 1 (local) to branch 2 (remote)
 ```
 
-### 3.6 Pull Requests (PRs)<a name="prs"></a>
+### 3.7 Pull Requests (PRs)
 
 
 

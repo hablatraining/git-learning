@@ -952,6 +952,7 @@ git merge (--continue | --abort | --quit)
 </details>
 
 The [git merge] command joins two or more branches. Usually, you will only see a merge from two branches.
+If we take a "deep" look to the merge commits you will se that we have more than one parent.
 
 <details><summary>ℹ️⚡ℹ️ Synopsis</summary>
 
@@ -1163,7 +1164,7 @@ now will be visible and available to work with them.
 <details><summary>🚧Let's practice</summary>
 
 ```bash
-# Speaker will create a new branch
+# >>>>> Speaker will create a new branch
 # Now we will use the git branch command using -a argument, to list all branches (local + remote)
 git branch -a
 # But I still see only my branch.. Why?
@@ -1176,13 +1177,15 @@ git branch -a
 git branch
 # Or if you are only interested in remote branches use -r argument
 git branch -r
+# >>>>> Speaker will create a new commit
+git fetch   # Here we also can see updated branches
 ```
 
 </details>
 
 Let's stop here, for now. Add this alias, and we will see how it works later.
 
-> 🎁♻️ **_Cool alias:_**  `git config --global alias.sync = fetch origin main:main`
+> 🎁♻️ **_Cool alias:_** Not valid for current branch `git config --global alias.sync = fetch origin main:main`
 
 ### 3.3 Working with others 2 (pull-push)
 <details><summary>ℹ️⚡ℹ️ Synopsis</summary>
@@ -1191,6 +1194,7 @@ Let's stop here, for now. Add this alias, and we will see how it works later.
 git pull [--tags] [-v | --verbose]
          [--no-commit] [-e | --edit] [--ff-only]
          [--squash] [--autostash]
+         [-r | --rebase[=false|true|merges|interactive]]
          [<repository> [<refspec>...]]
 ```
 </details>
@@ -1200,8 +1204,8 @@ Under the hood, `git pull` is a making the following steps for you:
 1. [git fetch]: Sync local & remote repo histories scoped to the local branch that `HEAD` is pointed at
 2. [git merge] / [git rebase]: Git will reconcile the diverging branches (local/remote), if needed
 
-So let's say you have cloned some time ago a repo, you are at main but your team have been working on this repo, but you didn't.
-Your main branch will be behind several commits. If you perform a `git pull` command it will fetch + rebase your main branch:
+So let's say you have cloned some time ago a repo, you are at main but your team have been working on this repo (and you didn't).
+Your main branch will be behind several commits. If you perform a `git pull` command it will `fetch` + `rebase` your main branch:
 ```mermaid
 flowchart LR
    A --- B[B,\n main]
@@ -1210,7 +1214,7 @@ flowchart LR
    E --- F[F,\n origin/main]
    B -.-> |pull|F
 ```
-After:
+After (fast-forward):
 ```mermaid
 flowchart LR
    A --- B
@@ -1220,7 +1224,13 @@ flowchart LR
    B -.-> |pull|F
 ```
 
-But, what would have happened if you have been working over your main branch, or you are on another branch, and you want to "sync" it with main
+But, what would have happened if you have been working over your main branch, or you are on another branch, and you want to "sync" it with main?
+
+Spoiler alert: it will fail until you specify how to reconcile the differences or set a default behaviour:
+1. Merge: it will create a new merge commit (H), merging remote and local changes.
+2. Rebase: it will put your changes over the remote changes
+
+After (merge-commit):
 ```mermaid
 flowchart LR
    A --- B
@@ -1232,11 +1242,80 @@ flowchart LR
    F -.-> |pull|H
 ```
 
+After (rebase):
+```mermaid
+flowchart LR
+   A --- B
+   B --- C
+   B --- D[D,\n main\n ****DELETED****]
+   C --- E
+   E --- F[F,\n origin/main]
+   F -.- D'[D',\n main]
+   D -.-> D'
+```
+
 <details><summary>🚧Let's practice</summary>
 
 ```bash
-# --> Download develop changes only if your develop hasn't changed
-git pull --ff-only origin main
+# Let's simulate this situation using the previously created branch
+# We will start creating a new local branch from the remote branch
+git checkout -b testing origin/testing # As we saw before, we can create a new branch from other branches, the only difference here is we are creating this branch from a remote one
+# >>>>> Speaker will create a new commit + push
+git logtree
+git pull      # Some interesting things happened here.
+# 1. Changes were detected in our branch, that's why it says "Updating <COMMIT_1>..<COMMIT_2>
+# 2. Fast forward: we saw it in the example above, but fast forwarding means git can simply reach the new commit by moving its pointer, without creating new references.
+git logtree
+# Now our local & remote branch are in the same reference and we can work safely
+
+# Let's see the other situation.
+# All of us will create a new commit
+echo "I did this weeks ago" > some_file.txt
+git add .
+git commit -m "<MY NAME> some file"
+git pull    # This failed?
+# Yes, git does not know your preferences, so you must specify how to act, or save this preferences in your config (see hint comments after the command)
+# Say we have a big git history graph and you do not know the status of your local main (or you don't care).
+#     You just want to update your main, because you shouldn't have changes at main if they are not on the remote...
+#     And if you have something, probably it should not be there (it could be a test you performed to see something, but you do not want to keep it)
+#     This is very useful to keep in mind changes that "shouldn't" be there.
+# In this case we will force pull to fast-forward or fail
+git pull --ff-only
+# As you and me made changes, it failed as we expected. In a normal project, you should act depending on the changes of your local and remote branches.
+
+# For example, if we want to keep our changes we could use the merge flag.
+# As you will see, it acts like it is a local branch and merges the changes (fetch + merge, as promised).
+git pull --rebase=false
+git logtree
+# Let's rollback this changes so we can see the rebase flag
+git reset --hard HEAD~1
+# Nothing fancy, it acts like a local branch and rebase the changes (fetch + rebase, as promised as well)
+git pull --rebase
+git logtree
+
+
+# WAIT!!!
+# I know what you are thinking: why the f*ck did I start this sh$t!
+# Or maybe you are thinking: Yeah, this is easy. Now we have just one shared branch and there are no changes on the fly.
+#     But what if in our team there are 5 people, working on the same repo (different branches) and I want to keep the track of the main
+#     branch as the merge while I work? Because I like rebase. Rebase is goooooood. Or someone force me to rebase.
+#     Well, if you are working you probably didn't commit yet, but you see some changes when you fetch. So if you want to sync main
+#     what would you do? Let me guess:
+#     Stash or commit your changes, checkout main, pull main, checkout your branch, pop your stash or amend commit or whatever,
+#     am I right (or close to)?
+#     There is no need. Remember the last alias you added but we didn't explain? Let's see what it does:
+# >>>>> Speaker will create a branch
+git fetch testing2
+git branch testing2
+# >>>>> Speaker will create a new commit + push
+git fetch
+git logtree
+# As we see, we are still on testing branch. Now we will make a change (not committed) and update the new branch, without leaving the current one
+echo "hope this works, because if it doesn't I will lose it" > no_pain_no_gain.txt
+git fetch origin testing2:testing2
+
+# This is not necessary, but it seemed useful to me. Now that you know more and more about git, actually there are multiple options,
+# in fact, you do not really need to sync your local main, because you could merge/rebase your local branch with the remote main.
 ```
 </details><br>
 

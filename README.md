@@ -35,7 +35,10 @@ sequenceDiagram
     participant r as Remote repository
     w->>s: git add
     s->>l: git commit
+    rect rgb(191, 223, 255)
     l->>l: git tag
+    r->>r: git tag
+    end
     rect rgb(191, 223, 255)
     l->>l: git branch
     r->>l: git branch
@@ -50,8 +53,10 @@ sequenceDiagram
     l->>w: git reset
     r->>w: git reset
     end
-    # Note over w, r: You can also create a branch, checkout or reset from remote
+    Note over w, r: You can also create a branch, checkout or reset from remote
 ```
+
+If there is any word or concept you do not understand you should take a look at [git glossary].
 
 ## 1. Setting your environment
 ![](resources/icons/docker.png)
@@ -1089,6 +1094,7 @@ git logtree
 
 ----
 ----
+
 ## 3. Working with remotes
 ![](resources/icons/github.png)![](resources/icons/gitlab.png)![](resources/icons/bitbucket.png)
 
@@ -1107,7 +1113,8 @@ git clone [-v | --verbose] [-l | --local]
 </details>
 
 The [git clone] command copies a repository into a new directory.
-This is commonly used at the beginning of a project or at CI/CD[^CI/CD] pipelines.
+Probably you will only use this command to download a repo from a remote repository to your local computer,
+but it is also commonly used when you have to manage CI/CD[^CI/CD] pipelines.
 
 We will also take a look at [git remote] command, which let us manage links between local and remote repositories.
 
@@ -1137,7 +1144,7 @@ git remote show origin
 ```
 
 > ⚠️⚠️ **GitHub support for password authentication was removed on August 13, 2021.**:
-> Let's create a Personal Token Access (PAT) following the [official documentation](https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/creating-a-personal-access-token)
+> Let's create a Personal Token Access ([PAT]) following the official documentation.
 
 ### 3.2 Working with others 1 (fetching)
 <details><summary>ℹ️⚡ℹ️ Synopsis</summary>
@@ -1150,17 +1157,30 @@ git fetch [--all] [-v | --verbose]
 ```
 </details>
 
-The [git fetch] command TODO
+The [git fetch] command syncs your local and remote repositories, so if new tags or branches have been created or updated,
+now will be visible and available to work with them.
 
 <details><summary>🚧Let's practice</summary>
 
 ```bash
-# Speaker will create a new branch & push a new commit
-git branch
+# Speaker will create a new branch
+# Now we will use the git branch command using -a argument, to list all branches (local + remote)
 git branch -a
+# But I still see only my branch.. Why?
+# Because the new branch was created after you cloned the repo, so your copy does not contain that reference
+# If we fetch our remote now we will download 
+git fetch     # As you can see here, git will warn us about new branches or other changes
+# Now if we take a look again we can see the new branch
+git branch -a
+# Remember to use -a argument to list local & remote branches
+git branch
+# Or if you are only interested in remote branches use -r argument
+git branch -r
 ```
 
 </details>
+
+Let's stop here, for now. Add this alias, and we will see how it works later.
 
 > 🎁♻️ **_Cool alias:_**  `git config --global alias.sync = fetch origin main:main`
 
@@ -1175,10 +1195,10 @@ git pull [--tags] [-v | --verbose]
 ```
 </details>
 
-The _[git pull]_ command is used to sync and download content from a remote repository.
+The [git pull] command is used to sync and download content from a remote repository.
 Under the hood, `git pull` is a making the following steps for you:
-1. _[git fetch]_: Sync local & remote repo histories scoped to the local branch that `HEAD` is pointed at
-2. _[git merge]_ / _[git rebase]_: Git will reconcile the diverging branches (local/remote), if needed
+1. [git fetch]: Sync local & remote repo histories scoped to the local branch that `HEAD` is pointed at
+2. [git merge] / [git rebase]: Git will reconcile the diverging branches (local/remote), if needed
 
 So let's say you have cloned some time ago a repo, you are at main but your team have been working on this repo, but you didn't.
 Your main branch will be behind several commits. If you perform a `git pull` command it will fetch + rebase your main branch:
@@ -1254,7 +1274,9 @@ The [git push] command TODO
 
 [docker]: https://docs.docker.com/get-docker/
 [mermaid]: https://mermaid-js.github.io/
+[PAT]: https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/creating-a-personal-access-token
 
+[git glossary]: https://www.git-scm.com/docs/gitglossary
 [git config]: https://git-scm.com/docs/git-config
 [git init]: https://git-scm.com/docs/git-init
 [git commit]: https://git-scm.com/docs/git-commit

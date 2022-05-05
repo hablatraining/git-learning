@@ -9,11 +9,12 @@
    2. [Tracking files](#22-tracking-files)
    3. [Log & alias](#23-log--alias)
    4. [HEAD, relative references & branch creation and repositioning](#24-head-relative-references--branch-creation-and-repositioning)
-   5. [Stashing](#25-stashing)
-   6. [Rollback changes](#26-rollback-changes)
-   7. [Amending](#27-amending)
-   8. [Cherry picking](#28-cherry-picking)
-   9. [Branch integration (merge & rebase)](#29-branch-integration-merge--rebase)
+   5. [Diff & blaming](#25-differences--blaming)
+   6. [Stashing](#26-stashing)
+   7. [Rollback changes](#27-rollback-changes)
+   8. [Amending](#28-amending)
+   9. [Cherry picking](#29-cherry-picking)
+   10. [Branch integration (merge & rebase)](#210-branch-integration-merge--rebase)
 3. [Working with remotes](#3-working-with-remotes)
    1. [Cloning a remote repository](#31-cloning-a-remote-repository)
    2. [Working with others 1 (fetching)](#32-working-with-others-1-fetching)
@@ -55,8 +56,14 @@ sequenceDiagram
 ## 1. Setting your environment
 ![](resources/icons/docker.png)
 
-We will use [docker][^docker] so we can have the same isolated environment:
+We will use [docker],[^docker] so we can have the same isolated environment:
+
+> **Note:** ⚠️ You will need some data of this repo, so you may:
+> 1. Download `docker` folder
+> 2. Or clone this repo: `git clone https://github.com/hablatraining/git-learning.git`
+
 ```bash
+# Enter to docker folder, previously downloaded
 cd docker/
 docker build -t training/git .
 # If you are not familiar with docker, -v will create a volume inside the docker directory.
@@ -131,6 +138,7 @@ git commit [-a | --all] [--interactive] [-p | --patch]
 <details><summary>🚧Let's practice</summary>
 
 ```bash
+cd projects
 ls -l
 # First of all, let's say to git who we are and which name should it display
 git config --global user.email eduardo.ruiz@hablapps.com
@@ -492,6 +500,9 @@ git logtree
 ```
 </details>
 
+> 🎁♻️ **_Cool alias:_** `git config --global alias.backup "branch backup/$(git rev-parse --abbrev-ref HEAD)"`<br>
+> 🎁♻️ **_Cool alias:_** `git config --global alias.backupf "branch -f backup/$(git rev-parse --abbrev-ref HEAD)"`<br>
+
 ### 2.5 Differences & blaming
 
 <details><summary>ℹ️⚡ℹ️ Synopsis</summary>
@@ -607,7 +618,6 @@ git annotate lorem_ipsum.txt
 ```
 </details>
 
-
 ### 2.6 Stashing
 ![](resources/icons/stash.png)
 
@@ -689,7 +699,7 @@ git stash show -p
 ```
 </details>
 
-### 2.6 Rollback changes
+### 2.7 Rollback changes
 ![](resources/icons/rollback.png)
 
 <details><summary>ℹ️⚡ℹ️ Synopsis</summary>
@@ -712,7 +722,7 @@ git reset [--soft | --mixed | --hard] [<commit>]
 </details>
 
 The [git reset] command repositions our HEAD to the given reference.
-This command rewrites the git history, so be careful when using it.
+⚠️ This command rewrites the git history, so be careful when using it.
 
 ```mermaid
 stateDiagram-v2
@@ -818,11 +828,11 @@ git logtree
 ```
 </details>
 
-### 2.7 Amending
+### 2.8 Amending
 ![](resources/icons/amend.png)
 
 Previously we saw the [git commit] command, but there is an argument that needs a special mention: `amend`.
-This argument rewrites the last commit, so, as other commands that rewrites the git history, be careful.
+⚠️ This argument rewrites the last commit, so, as other commands that rewrites the git history, be careful.
 Anyway, this option let us clean our git history if we see something wrong or to improve.
 
 <details><summary>🚧Let's practice</summary>
@@ -851,7 +861,7 @@ git log --pretty=fuller -n 2
 ```
 </details>
 
-### 2.8 Cherry picking
+### 2.9 Cherry picking
 ![](resources/icons/cherrypick.png)
 
 <details><summary>ℹ️⚡ℹ️ Synopsis</summary>
@@ -924,20 +934,34 @@ git config user.name "Eduardo Ruiz"
 ```
 </details>
 
-### 2.9 Branch integration (merge & rebase)
+### 2.10 Branch integration (merge & rebase)
 ![](resources/icons/branch_compare.png)
 
 <details><summary>ℹ️⚡ℹ️ Synopsis</summary>
 
+```bash
+git merge [--no-commit] [--squash] [--ff | --no-ff | --ff-only]
+          [-m <msg>] [<commit>...]
+git merge (--continue | --abort | --quit)
+```
 </details>
 
-The [git merge] command TODO
+The [git merge] command joins two or more branches. Usually, you will only see a merge from two branches.
 
 <details><summary>ℹ️⚡ℹ️ Synopsis</summary>
 
+```bash
+git rebase [-i | --interactive] [--onto <newbase> | --keep-base]
+          [--no-ff] [<upstream> [<branch>] | <branch>]
+git rebase (--continue | --skip | --abort | --quit | --edit-todo | --show-current-patch)
+```
 </details>
 
-The [git rebase] command TODO
+The [git rebase] command move and/or manage a set of commits to another base.
+If we have a branches A & B(HEAD), it is like we create A' as temporal branch
+and take the commits from A, one by one, and apply a cherry-pick or amend over B,
+then delete A and rename A' to A.
+⚠️ This command rewrites the git history, so be careful.
 
 Initial
 ```mermaid
@@ -953,7 +977,7 @@ branch newbranch
 checkout newbranch
 commit
 commit
-checkout master
+checkout main
 commit
 commit
 ```
@@ -972,14 +996,15 @@ branch newbranch
 checkout newbranch
 commit
 commit
-checkout master
+checkout main
 commit
 commit
 checkout newbranch
-merge master
+merge main
 commit
 ```
 
+Rebase:
 ```mermaid
 gitGraph:
 options
@@ -1001,27 +1026,60 @@ commit
 <details><summary>🚧Let's practice</summary>
 
 ```bash
+# Let's make some modifications to explain the merge command
 git checkout feature/myOtherFeature
 echo -e "some code here...\n" >> MyClass.scala
 git commit -am "some code"
-git branch backup/feature/myOtherFeature feature/myOtherFeature
+# He updated a file, but this file is only in this branch,
+#     so if we go to main this file does not exist.
 git checkout main
 ls -l
+# The way we have being working, if we simply merge it will "fast-forward" merge.
+# Let's not let this situation, so we can see common merges.
+# We will explain this later if we have time.
 git merge --no-ff feature/myOtherFeature
-#### git merge (--continue | --skip | --abort | --quit)
 git logtree
 ls -l
+# As we can see in the log, a new commit was created from our branch to main.
+#     This commit contains all of our changes
+# Let's rollback this situation, because, like other commands, merge may result
+#     in conflicting results... Let's see them and abort them
 git reset --hard HEAD~1
-git logtree
+echo "Some class" > MyClass.scala
+git add .
+git commit -m "some class"
+git merge --no-ff feature/myOtherFeature
+git merge --abort
 
+# Another interesting argument is squash. This allow us to consolidate all our
+#     commits into a single commit.
 git merge --squash feature/myOtherFeature
 git commit -m "merge feature/myOtherFeature -> main"
 git logtree
 ls -l
 
+# Let's prepare main to see how rebase works
 git reset --hard HEAD~1
+echo "before rebase" >> README.md
+git commit -am "before rebase"
+# NOTE: while merge "brings" changes, rebase moves changes.
+#     This means: if we want to merge something into main, our HEAD must be at main,
+#     but if we want to rebase main, our HEAD must be at our branch.
 git checkout feature/myOtherFeature2
+git backup
 git rebase main
+# DONE!!
+git logtree
+# As we can see, now our branch is ahead of main, and we have the "same"
+#     commits (we now have new hashes, committer is updated, etc)
+
+# But why to use rebase if I still have to merge my branch into main?
+#     Consider the situation of someone making an improvement or a fix and it is
+#     already merged into main. A rebase helps you to test your code against
+#     the last version, avoiding unused code, or fixing tests before merging.
+git reset --hard backup/feature/myOtherFeature2
+# In order to see conflicts while rebasing and show the risks and the potential
+#     of this command we will merge feature/myOtherFeature into main
 #### git rebase (--continue | --skip | --abort | --quit)
 git logtree				### WATCH! deleted commit
 git rebase -i main		### PICK + SQUASH
@@ -1102,10 +1160,6 @@ git branch
 git branch -a
 ```
 
-```bash
-backup = !f() { git branch --verbose backup/$(git branch --show-current)/$(date +'%Y%m%d_%H%M%S') && echo Backup created: backup/$(git branch --show-current)/$(date +'%Y%m%d_%H%M%S');}; f
-git checkout -b backup/$(git rev-parse --abbrev-ref HEAD)
-```
 </details>
 
 > 🎁♻️ **_Cool alias:_**  `git config --global alias.sync = fetch origin main:main`

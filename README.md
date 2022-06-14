@@ -13,16 +13,16 @@
    6. [Stashing](#26-stashing)
    7. [Rollback changes](#27-rollback-changes)
    8. [Amending](#28-amending)
-   9. [Cherry picking](#29-cherry-picking)
+   9. [Cherry-picking](#29-cherry-picking)
    10. [Branch integration (merge & rebase)](#210-branch-integration-merge--rebase)
 3. [Working with remotes](#3-working-with-remotes)
    1. [Cloning a remote repository](#31-cloning-a-remote-repository)
    2. [Working with others 1 (fetching)](#32-working-with-others-1-fetching)
    3. [Working with others 2 (pull-push)](#33-working-with-others-2-pull-push)
-   4. [Multiple remotes (forking)](#34-multiple-remotes-forking)
-   5. [Force push](#35-force-push)
-   6. [Tracking your branches](#36-tracking-your-branches)
-   7. [Pull Requests (PRs)](#37-pull-requests-prs)
+   7. [Pull Requests (PRs)](#34-pull-requests-prs)
+   4. [Multiple remotes (forking)](#35-multiple-remotes-forking)
+   5. [Force push](#36-force-push)
+   6. [Tracking your branches](#37-tracking-your-branches)
 ----
 ## 0. Cheatsheet
 We use some [mermaid] graphs, only visible in GitHub (you will see only code in local)
@@ -70,7 +70,7 @@ We will use [docker],[^docker] so we can have the same isolated environment:
 ```bash
 # Enter to docker folder, previously downloaded
 cd docker/
-docker build -t training/git .
+docker build . -t training/git
 # If you are not familiar with docker, -v will create a volume inside the docker directory.
 #     Whatever you create inside your docker container at projects folder will be at this volume too,
 #     so you can see your files and repos from your computer or git clients.
@@ -143,7 +143,8 @@ git commit [-a | --all] [--interactive] [-p | --patch]
 <details><summary>🚧Let's practice</summary>
 
 ```bash
-cd projects
+mkdir -p -v projects/local
+cd projects/local
 ls -l
 # First of all, let's say to git who we are and which name should it display
 git config --global user.email eduardo.ruiz@hablapps.com
@@ -278,9 +279,6 @@ git status
 ls -l
 # If we "save" this new state "removing" the file, future changes will not be tracked.
 git commit -m "untrack myTest.log"
-echo "#bash" >> edu.sh
-git status
-
 
 # WARNING!: This steps allow us to stop tracking files, BUT the files remain in the git history.
 #   We will see the git history in detail in the next sections.
@@ -457,8 +455,9 @@ echo "commit 3" >> README.md
 git commit -am "commit 3"
 git checkout branch1
 
-echo "commit 4" >> tests.txt
-git commit -am "commit 4"
+echo "commit 4" > tests.txt
+git add tests.txt
+git commit -m "commit 4"
 # Let me use the merge command, but we will see it  in detail on a further section
 git merge branch2
 git logtree
@@ -468,13 +467,13 @@ git logtree
 # First of all, let's create a branch called "ref"
 git branch ref
 # We can also create a branch from other branch
-git branch main ref2
+git branch ref2 main
 # But what if we already have a branch and it is not in the correct position?
 # We can "move" the reference of a branch so we can reposition that branch.
 # To achieve that, we have to use -f flag. That means we FORCE the creation of a branch
 #   somewhere in the git history, if the branch exists, overwrite it.
-git branch main ref # This will fail, for ref already exists.
-git branch -f main ref
+git branch ref main # This will fail, for ref already exists.
+git branch -f ref ref
 git logtree
 
 # We can also create branches from relative positions
@@ -695,6 +694,7 @@ git stash show -p stash@{0}
 git stash show -p stash@{1}
 
 # We can also save stashes with a message so it will be easier to know what we were doing
+git stash apply stash@{0}
 git stash -m "WIP feature my stash"
 git stash list
 # We can delete our stashes anytime using drop
@@ -736,8 +736,8 @@ stateDiagram-v2
         [*] --> +A
         +A --> +B
         +B --> +C
-        +C --> A
-        +A --> A: Undo changes\n(new commit)
+        +C --> ~A
+        +A --> ~A: Undo changes\n(new commit)
     }
     state Reset {
         direction BT
@@ -978,14 +978,18 @@ options
     "nodeRadius": 5
 }
 end
-commit
-branch newbranch
-checkout newbranch
-commit
-commit
-checkout main
-commit
-commit
+    commit id:"m-0001"
+    branch newbranch
+    checkout newbranch
+    commit id:"b-0001"
+    checkout main
+    commit id:"m-0002"
+    checkout newbranch
+    commit id:"b-0002"
+    checkout main
+    commit id:"m-0003"
+    checkout newbranch
+    commit id:"b-0003"
 ```
 
 Merge:
@@ -997,17 +1001,20 @@ options
     "nodeRadius": 5
 }
 end
-commit
-branch newbranch
-checkout newbranch
-commit
-commit
-checkout main
-commit
-commit
-checkout newbranch
-merge main
-commit
+    commit id:"m-0001"
+    branch newbranch
+    checkout newbranch
+    commit id:"b-0001"
+    checkout main
+    commit id:"m-0002"
+    checkout newbranch
+    commit id:"b-0002"
+    checkout main
+    commit id:"m-0003"
+    checkout newbranch
+    commit id:"b-0003"
+    checkout main
+    merge newbranch
 ```
 
 Rebase:
@@ -1019,14 +1026,23 @@ options
     "nodeRadius": 5
 }
 end
-commit
-commit
-commit
-branch newbranch
-checkout newbranch
-commit
-commit
-commit
+    commit id:"m-0001"
+    branch newbranch order: 2
+    checkout newbranch
+    commit id:"b-0001" type:REVERSE
+    checkout main
+    commit id:"m-0002"
+    checkout newbranch
+    commit id:"b-0002" type:REVERSE
+    checkout main
+    commit id:"m-0003"
+    checkout newbranch
+    commit id:"b-0003" type:REVERSE
+    checkout main
+    branch newBranch order: 1
+    commit id:"b-0001'" type:HIGHLIGHT
+    commit id:"b-0002'" type:HIGHLIGHT
+    commit id:"b-0003'" type:HIGHLIGHT
 ```
 
 <details><summary>🚧Let's practice</summary>
@@ -1114,6 +1130,7 @@ git clone [-v | --verbose] [-l | --local]
 </details>
 
 The [git clone] command copies a repository into a new directory.
+Usually, the "remote" repository is called `origin`, but you can name it whatever you like.
 Probably you will only use this command to download a repo from a remote repository to your local computer,
 but it is also commonly used when you have to manage CI/CD[^CI/CD] pipelines.
 
@@ -1228,7 +1245,7 @@ But, what would have happened if you have been working over your main branch, or
 
 Spoiler alert: it will fail until you specify how to reconcile the differences or set a default behaviour:
 1. Merge: it will create a new merge commit (H), merging remote and local changes.
-2. Rebase: it will put your changes over the remote changes
+2. Rebase: it will put your changes over the remote changes, so your D commit will be moved over main, recreating this commit as D'
 
 After (merge-commit):
 ```mermaid
@@ -1316,6 +1333,10 @@ git fetch origin testing2:testing2
 
 # This is not necessary, but it seemed useful to me. Now that you know more and more about git, actually there are multiple options,
 # in fact, you do not really need to sync your local main, because you could merge/rebase your local branch with the remote main.
+
+# Or... you could merge/rebase simply another branch
+# >>>>> Speaker will create a new branch + commit + push
+git pull origin testing3
 ```
 </details><br>
 
@@ -1328,28 +1349,110 @@ git push [--tags] [--porcelain] [-v | --verbose]
 ```
 </details>
 
-The [git push] command TODO
+The [git push] command sends your local tracked changes to your remote/s.
+This means, it updates the remote repository to match your local repository (the branch or tag you are pushing).
+
+Before git push
+```mermaid
+flowchart LR
+   A --- B[B,\n origin/main]
+   B --- C[C,\n tag:v1]
+   C --- E
+   E --- F[F,\n main]
+```
+After git push:
+```mermaid
+flowchart LR
+   A --- B
+   B --- C[C,\n tag:v1\n tag:origin/v1]
+   C --- E
+   E --- F[F,\n origin/main,\n main]
+```
 
 <details><summary>🚧Let's practice</summary>
 
+```bash
+git push
+```
 </details>
 
-### 3.4 Multiple remotes (forking)
+### 3.4 Pull Requests (PRs)
 
-### 3.5 Force push
+<details><summary>🚧Let's practice</summary>
 
-### 3.6 Tracking your branches
+```bash
+git XXXX
+```
+</details>
+
+### 3.5 Multiple remotes (forking)
+When you fork a repository you are, in fact, cloning it, but not to your local machine, it is a server-side clone.
+But, why to do so? There might be several reasons to fork, or not to fork, but the main reason could be to manage
+the contributions without a complex permission management.
+
+Imagine you are the one who owns a repository, and it is not private, as you want people to help you by contributing.
+You will need to wait until someone reaches you, then you will grant access, but only to do certain things
+(you do not want anyone to delete your code, or to grant other people access).
+After a few years you have many people helping you, with different roles, some of them are not contributing anymore, so you should remove them...
+And what it is worst, each one of them have between 1 and 5 branches, some of them are up-to-date, other ones are not, others simply are tests...
+How would you clean up your repository?
+With a fork-based develop you don't need to. You simply make your repo accessible to the people you may want, and they will fork it (server-side clone).
+Those people will not have permission (or at least they shouldn't) to push or manages your repo, they will manage theirs, so if anyone wants to create a million of branches, they can do it without messing with your repository.
+When someone develops a feature that wants to be integrated into the "main" code, that person will create a PR[^PR] and you (or your team) will accept or reject it.
+
+When you work with forks you have to think that you are working with (at least) 3 repositories at the same time,
+each one of them have their own history and restrictions:
+1. The main repository, from where you created your fork.
+   * You will have to clone this repository to your local, this remote is usually called `upstream`
+   * Probably you won't be granted to do almost anything
+2. Your forked repository, which it is a perfect copy, but it will be managed by yourself
+   * You will have to clone this repository too, this one is usually called `origin`, as if it were a normal clone
+   * You can do anything you want here (grant/restrict access to anyone, delete the repo, etc.)
+3. Your local repository
+
+To sum up, you will usually have to do the following steps if you are working in a fork-based team:
+1. Fork the "main" repo to your personal server-side space.
+2. Clone your forked repo as `origin`
+3. Clone the "main" repo as `upstream`
+4. Manage your local branches (not necessary, but recommended):
+   * Delete the branches you don't want, if there are any.
+   * Change your "main" branches (master/main/develop) so their remotes are the `upstream` repository,
+     * if you don't do this, when you pull a branch it will be pulling it from your `origin`, instead of `upstream`(which is the one everybody is contributing at)
+     * you may not do this, if you specify where to pull from but...
+     * why to keep your `origin` branches up to date when you are not using them? If you create a feature is a new branch, this one should be up-to-date, but not the rest of them
+5. Create a new branch from `upstream`
+6. Commit, merge, rebase or do anything you need to develop your feature
+7. Push your branch to your fork (`origin`)
+8. Create a pull request from `origin/your_branch` to `upstream/main_or_develop_branch`
+9. The PR[^PR] gets approved and merged or changes will be requested (go to step 6, skip 8, as the PR[^PR] will be automatically updated)
+
+<details><summary>🚧Let's practice</summary>
+
+```bash
+git XXXX
+```
+</details>
+
+### 3.6 Force push
+
+<details><summary>🚧Let's practice</summary>
+
+```bash
+git push
+```
+</details>
+
+### 3.7 Tracking your branches
 ```bash
 # rename a pushed branch
 # push branch 1 (local) to branch 2 (remote)
 ```
 
-### 3.7 Pull Requests (PRs)
-
 
 
 [^docker]: Docker is an open platform for developing, shipping, and running applications, letting us build an isolated environment, like a virtual machine. This way, all of us will have the same brand-new environment, where we can run our command safely.
 [^CI/CD]: Continuous integration (CI) and continuous delivery (CD)
+[^PR]: Pull Request
 
 [docker]: https://docs.docker.com/get-docker/
 [mermaid]: https://mermaid-js.github.io/

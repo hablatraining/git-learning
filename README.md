@@ -376,31 +376,31 @@ No need for that, we can also move from git history using "~" and "^" characters
 
 When we use "~" character we mean "the first father of". We can tell git where we start looking and how many commits
 behind should we reposition our HEAD. This means:
-* HEAD~ --> The first parent of HEAD
-* main~~ --> Two parents behind main
-* main~4 --> Four parents behind main, === main~~~~
+* `HEAD~` --> The first parent of HEAD
+* `main~~` --> Two parents behind main
+* `main~4` --> Four parents behind main, === `main~~~~`
 
 When we use "^" character we also mean "the first father of", but in a non-linear way.
 It is usually used on merge commits, because in git we can have several parents (usually two).
 This means:
-* HEAD^ --> The first parent of HEAD, === HEAD~ for a commit with only one parent
-* main^^ --> Two parents behind main, === main~~ === main~2 for commits with only one parent
-* main^2 --> The second parent from main =!= main~2
+* `HEAD^` --> The first parent of HEAD, === `HEAD~` for a commit with only one parent
+* `main^^` --> Two parents behind main, === `main~~` === `main~2` for commits with only one parent
+* `main^2` --> The second parent from main =!= `main~2` ⚠️
 
 We can also Take a look to the following examples:
 
-| Example  | Result                 |
-| -------- | ---------------------- |
-|HEAD^     | is the `K` commit      |
-|HEAD~1    | is also the `K` commit |
-|HEAD^^    | is the `I` commit      |
-|HEAD~^    | is also the `I` commit |
-|HEAD~2    | is also the `I` commit |
-|HEAD~^2   | is the `J` commit      |
-|HEAD~^^   | is the `H` commit      |
-|HEAD~3    | is also the `H` commit |
-|HEAD~4^~  | is the `C` commit      |
-|HEAD~4^2~ | is the `D` commit      |
+|   Example   | Result                                                                 |
+|:-----------:|------------------------------------------------------------------------|
+|   `HEAD^`   | <details><summary>Solution</summary> is the `K` commit </details>      |
+|  `HEAD~1`   | <details><summary>Solution</summary> is also the `K` commit </details> |
+|  `HEAD^^`   | <details><summary>Solution</summary> is the `I` commit </details>      |
+|  `HEAD~^`   | <details><summary>Solution</summary> is also the `I` commit </details> |
+|  `HEAD~2`   | <details><summary>Solution</summary> is also the `I` commit </details> |
+|  `HEAD~^2`  | <details><summary>Solution</summary> is the `J` commit </details>      |
+|  `HEAD~^^`  | <details><summary>Solution</summary> is the `H` commit </details>      |
+|  `HEAD~3`   | <details><summary>Solution</summary> is also the `H` commit </details> |
+| `HEAD~4^~`  | <details><summary>Solution</summary> is the `C` commit </details>      |
+| `HEAD~4^2~` | <details><summary>Solution</summary> is the `D` commit </details>      |
 
 ```mermaid
 flowchart LR
@@ -1134,6 +1134,17 @@ Usually, the "remote" repository is called `origin`, but you can name it whateve
 Probably you will only use this command to download a repo from a remote repository to your local computer,
 but it is also commonly used when you have to manage CI/CD[^CI/CD] pipelines.
 
+```mermaid
+flowchart
+   origin[(origin)]
+   edu[[local-edu]]
+   pepe[[local-pepe]]
+   ana[[local-ana]]
+   origin <-- fetch\npull\npush --> edu
+   origin <-- fetch\npull\npush --> pepe
+   origin <-- fetch\npull\npush --> ana
+```
+
 We will also take a look at [git remote] command, which let us manage links between local and remote repositories.
 
 <details><summary>ℹ️⚡ℹ️ Synopsis</summary>
@@ -1377,18 +1388,96 @@ git push
 </details>
 
 ### 3.4 Pull Requests (PRs)
+A Pull Request (PR), or Merge Request, is a web feature that lets you start the merging process from your branch or fork to the developing or production code.
+Under the hood, it is a simple merge, but this feature provides useful tools you should use before merging:
+1. Show differences to review the code changes
+2. Show the commits that will be integrated
+3. Prevents premature code to be merged
+4. Perform some validations (CI/CD, merge strategy, code restrictions before integration)
+5. Let our teammates collaborate and learn from our code (and we could learn from them)
+6. There is an option that let us delete our branch after the merge (probably this branch is no longer useful) so we have a clean repository.
+
+**Best practices**:
+* You can create Pull Request templates if you are using [GitHub](https://docs.github.com/en/enterprise-server@3.3/communities/using-templates-to-encourage-useful-issues-and-pull-requests/creating-a-pull-request-template-for-your-repository) or [GitLab](https://docs.gitlab.com/ee/user/project/description_templates.html)
+* Label your PR and add reviewers.
+* Add a PR summary that helps other people what are you trying to merge
+* If your PR is not finished, but you want to create it anyway, use draft/WIP Pull Requests
+* I recommend you to associate your branch with a ticket/issue, but if you did not, you should associate your PR to your ticket/issue
+* After a PR is merged, you should fetch + pull the target branch, and maybe delete your local source branch, as it has been already integrated and there is no need to keep it
 
 <details><summary>🚧Let's practice</summary>
 
-```bash
-git XXXX
-```
+1. Create a local branch and make come changes
+2. Add + commit + push
+3. Go to your remote repository (now we will use our GitHub repo [https://github.com/hablatraining/git-learning/pulls])
+4. Click the "New pull request" button
+5. Select the source and target branches
+6. Here the PR is not yet created, but we can see what the reviewers will se (we could review our commits and code, so we make sure it is ok before creating the PR)
+   * If you do not want to create yet the PR, but you want someone to take a look, you could send the URL, and they could take a look at your changes (but they will not be able to comment or approve anything)
+7. From the moment you create the PR your teammates will be able to comment on your PR, or even create new commits
+8. Here we do not have any CI/CD workflow, but if we had, it would run now
 </details>
 
 ### 3.5 Multiple remotes (forking)
 When you fork a repository you are, in fact, cloning it, but not to your local machine, it is a server-side clone.
 But, why to do so? There might be several reasons to fork, or not to fork, but the main reason could be to manage
 the contributions without a complex permission management.
+
+```mermaid
+flowchart
+   origin[(origin)]
+   edu[[local-edu]]
+   pepe[[local-pepe]]
+   ana[[local-ana]]
+   origin <-- fetch\npull\npush --> edu
+   origin <-- fetch\npull\npush --> pepe
+   origin <-- fetch\npull\npush --> ana
+```
+```mermaid
+flowchart
+   upstream[(upstream)]
+   orig1[(origin-edu)]
+   orig2[(origin-pepe)]
+   orig3[(origin-ana)]
+   edu[[local-edu]]
+   pepe[[local-pepe]]
+   ana[[local-ana]]
+   upstream -.- orig1
+   upstream -.- orig2
+   upstream -.- orig3
+   orig1 <-- fetch\npull\npush --> edu
+   orig2 <-- fetch\npull\npush --> pepe
+   orig3 <-- fetch\npull\npush --> ana
+   upstream -- fetch\npull --> edu
+   upstream -- fetch\npull --> pepe
+   upstream -- fetch\npull --> ana
+   orig1 -- PR --> upstream
+   orig2 -- PR --> upstream
+   orig3 -- PR --> upstream
+```
+```mermaid
+flowchart
+   upstream[(upstream)]
+   orig1[(origin-edu)]
+   orig2[(origin-pepe)]
+   orig3[(origin-ana)]
+   edu[[local-edu]]
+   pepe[[local-pepe]]
+   ana[[local-ana]]
+   upstream -.- orig1
+   upstream -.- orig2
+   upstream -.- orig3
+   orig1 <--> edu
+   orig2 <--> pepe
+   orig3 <--> ana
+   upstream --> edu
+   upstream --> pepe
+   upstream --> ana
+   orig1 --> upstream
+   orig2 --> upstream
+   orig3 --> upstream
+   orig2 <-- fetch\npull\npush --> edu
+```
 
 Imagine you are the one who owns a repository, and it is not private, as you want people to help you by contributing.
 You will need to wait until someone reaches you, then you will grant access, but only to do certain things

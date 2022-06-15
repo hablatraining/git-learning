@@ -1,4 +1,4 @@
 *.class
 *.log
 .idea
-docker/git-volume
+docker/*volume*

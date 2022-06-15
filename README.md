@@ -90,55 +90,56 @@ Now, inside your docker, got to **projects/local** folder: `cd projects/local`
 ### 2.1 Starting with git
 ![](resources/icons/config.png)
 
-<details><summary>ℹ️⚡ℹ️ Synopsis</summary>
+We will see the following commands to begin with git:
+1. The [git config] command let us add, remove and show some configurations to customize the way you work with git.
+   <details><summary>ℹ️⚡ℹ️ Synopsis</summary>
 
-```bash
-git config [--<scope>] [--show-origin] <name> [<value> [<value-pattern>]]
-git config [--<scope>] --add <name> <value>
-git config [--<scope>] --unset <name> [<value-pattern>]
-git config [--show-origin] [--show-scope] -l | --list
-git config [--<scope>] -e | --edit
-```
+   ```bash
+   git config [--<scope>] [--show-origin] <name> [<value> [<value-pattern>]]
+   git config [--<scope>] --add <name> <value>
+   git config [--<scope>] --unset <name> [<value-pattern>]
+   git config [--show-origin] [--show-scope] -l | --list
+   git config [--<scope>] -e | --edit
+   ```
+   </details>
+
+
+2. The [git init] command creates an empty local git repository. An initial branch without any commits and `.git` folder will be created, where the local git config will be saved.
+
+   <details><summary>ℹ️⚡ℹ️ Synopsis</summary>
+
+   ```bash
+   git init [-b <branch-name> | --initial-branch=<branch-name>]
+            [<directory>]
+   ```
 </details>
 
-The [git config] command let us add, remove and show some configurations to customize the way you work with git.
-We will also see the following commands to begin with git:
-1. The [git init] command creates an empty local git repository. An initial branch without any commits and `.git` folder will be created, where the local git config will be saved.
+3. The [git add] command updates the internal git index so the given files will be tracked and prepared to be "committed". A file that has being "added" is also known as a staged file.
 
-<details><summary>ℹ️⚡ℹ️ Synopsis</summary>
+   <details><summary>ℹ️⚡ℹ️ Synopsis</summary>
 
-```bash
-git init [-b <branch-name> | --initial-branch=<branch-name>]
-         [<directory>]
-```
-</details>
-
-2. The [git add] command updates the internal git index so the given files will be tracked and prepared to be "committed". A file that has being "added" is also known as a staged file.
-
-<details><summary>ℹ️⚡ℹ️ Synopsis</summary>
-
-```bash
-git add [--verbose | -v] [--interactive | -i] [--patch | -p] [--edit | -e]
-        [--] [<pathspec>...]
-```
-</details>
-
-3. The [git commit] command is the one which actually saves the **staged** files.
-When you create a new commit you will save the following info among others:
-  * The actual changes (only the differences)
-  * Who performed the commit
-  * When the commit was created
-  * The commit parent
-  * etc
-
-<details><summary>ℹ️⚡ℹ️ Synopsis</summary>
-
-```bash
-git commit [-a | --all] [--interactive] [-p | --patch]
-           [-v | --verbose] [--amend] [-m | --message <msg>]
+   ```bash
+   git add [--verbose | -v] [--interactive | -i] [--patch | -p] [--edit | -e]
            [--] [<pathspec>...]
-```
-</details><br>
+   ```
+   </details>
+
+4. The [git commit] command is the one which actually saves the **staged** files.
+When you create a new commit you will save the following info among others:
+   * The actual changes (only the differences)
+   * Who performed the commit
+   * When the commit was created
+   * The commit parent
+   * etc
+
+   <details><summary>ℹ️⚡ℹ️ Synopsis</summary>
+   
+   ```bash
+   git commit [-a | --all] [--interactive] [-p | --patch]
+              [-v | --verbose] [--amend] [-m | --message <msg>]
+              [--] [<pathspec>...]
+   ```
+   </details><br>
 
 <details><summary>🚧Let's practice</summary>
 
@@ -181,6 +182,8 @@ git config --list --show-origin
 ### 2.2 Tracking files
 ![](resources/icons/track.png)
 
+The [git status] command shows the differences between the current local repository and the current HEAD commit.
+This means, it will show which files have been modified, added or deleted, and it's git state (untracked, modified, deleted, etc.)
 <details><summary>ℹ️⚡ℹ️ Synopsis</summary>
 
 ```bash
@@ -189,10 +192,6 @@ git status [-s | --short] [-b | --branch] [--show-stash]
            [--] [<pathspec>...]
 ```
 </details>
-
-The [git status] command shows the differences between the current local repository and the current HEAD commit.
-This means, it will show which files have been modified, added or deleted, and it's git state (untracked, modified, deleted, etc.)
-
 <details><summary>🚧Let's practice</summary>
 
 ```bash
@@ -287,6 +286,8 @@ git commit -m "untrack myTest.log"
 </details>
 
 ### 2.3 Log & alias
+The [git log] command shows the git commit history.
+This command is highly customizable, you can limit the number of commits, select a range, show it like a tree format, etc.
 
 <details><summary>ℹ️⚡ℹ️ Synopsis</summary>
 
@@ -300,10 +301,6 @@ git log
       [[--] <path>...]
 ```
 </details>
-
-The [git log] command shows the git commit history.
-This command is highly customizable, you can limit the number of commits, select a range, show it like a tree format, etc.
-
 <details><summary>🚧Let's practice</summary>
 
 ```bash
@@ -337,6 +334,7 @@ git logtree
 ### 2.4 HEAD, relative references & branch creation and repositioning
 ![](resources/icons/branch.png)
 
+The [git branch] command list or manage branches.
 <details><summary>ℹ️⚡ℹ️ Synopsis</summary>
 
 ```bash
@@ -352,8 +350,7 @@ git branch [-d | --delete | -D] <branchname>...
 ```
 </details>
 
-The [git branch] command list or manage branches.
-
+The [git checkout] command let us move between branches and restore files (discarding not committed changes).
 <details><summary>ℹ️⚡ℹ️ Synopsis</summary>
 
 ```bash
@@ -362,9 +359,6 @@ git checkout [[-b|-B] <new-branch>] [<start-point>]
 git checkout (-p|--patch) [--] [<pathspec>...]
 ```
 </details>
-
-The [git checkout] command let us move between branches and restore files (discarding not committed changes).
-
 In git, you are always somewhere in the git history. That means, you are always seeing a commit, in the git history.
 **HEAD** is the pointer to the current commit you are viewing. Every time you switch from one branch to another,
 your **HEAD** moves from one branch to the other.
@@ -389,19 +383,6 @@ This means:
 
 We can also Take a look to the following examples:
 
-|   Example   | Result                                                                 |
-|:-----------:|------------------------------------------------------------------------|
-|   `HEAD^`   | <details><summary>Solution</summary> is the `K` commit </details>      |
-|  `HEAD~1`   | <details><summary>Solution</summary> is also the `K` commit </details> |
-|  `HEAD^^`   | <details><summary>Solution</summary> is the `I` commit </details>      |
-|  `HEAD~^`   | <details><summary>Solution</summary> is also the `I` commit </details> |
-|  `HEAD~2`   | <details><summary>Solution</summary> is also the `I` commit </details> |
-|  `HEAD~^2`  | <details><summary>Solution</summary> is the `J` commit </details>      |
-|  `HEAD~^^`  | <details><summary>Solution</summary> is the `H` commit </details>      |
-|  `HEAD~3`   | <details><summary>Solution</summary> is also the `H` commit </details> |
-| `HEAD~4^~`  | <details><summary>Solution</summary> is the `C` commit </details>      |
-| `HEAD~4^2~` | <details><summary>Solution</summary> is the `D` commit </details>      |
-
 ```mermaid
 flowchart LR
    A --> B
@@ -419,6 +400,26 @@ flowchart LR
    K --> L[L,\n HEAD]
 ```
 
+|   Example   | Result                                                                 |
+|:-----------:|------------------------------------------------------------------------|
+|   `HEAD^`   | <details><summary>Solution</summary> is the `K` commit </details>      |
+|  `HEAD~1`   | <details><summary>Solution</summary> is also the `K` commit </details> |
+|  `HEAD^^`   | <details><summary>Solution</summary> is the `I` commit </details>      |
+|  `HEAD~^`   | <details><summary>Solution</summary> is also the `I` commit </details> |
+|  `HEAD~2`   | <details><summary>Solution</summary> is also the `I` commit </details> |
+|  `HEAD~^2`  | <details><summary>Solution</summary> is the `J` commit </details>      |
+|  `HEAD~^^`  | <details><summary>Solution</summary> is the `H` commit </details>      |
+|  `HEAD~3`   | <details><summary>Solution</summary> is also the `H` commit </details> |
+| `HEAD~4^~`  | <details><summary>Solution</summary> is the `C` commit </details>      |
+| `HEAD~4^2~` | <details><summary>Solution</summary> is the `D` commit </details>      |
+
+
+The [git tag] command let us manage special references called tags.
+You may wonder what's the difference between branches and tags: both references
+some point of the git history, but branches are "active" lines of development
+while tags do not evolve and are used to mark special moments of the git history,
+like a release version.
+
 <details><summary>ℹ️⚡ℹ️ Synopsis</summary>
 
 ```bash
@@ -427,12 +428,6 @@ git tag -d <tagname>...
 git tag -l | --list [-i | --ignore-case] [--sort=<key>] [--format=<format>] [<pattern>...]
 ```
 </details>
-
-The [git tag] command let us manage special references called tags.
-You may wonder what's the difference between branches and tags: both references
-some point of the git history, but branches are "active" lines of development
-while tags do not evolve and are used to mark special moments of the git history,
-like a release version.
 
 <details><summary>🚧Let's practice</summary>
 
@@ -509,6 +504,7 @@ git logtree
 
 ### 2.5 Differences & blaming
 
+The [git diff] command show changes between commits, branches, etc.
 <details><summary>ℹ️⚡ℹ️ Synopsis</summary>
 
 ```bash
@@ -518,8 +514,7 @@ git diff [<options>] <blob> <blob>
 ```
 </details>
 
-The [git diff] command show changes between commits, branches, etc.
-
+The [git blame] command show the commit, when and who last modified each line of a file.
 <details><summary>ℹ️⚡ℹ️ Synopsis</summary>
 
 ```bash
@@ -529,8 +524,6 @@ git blame [-e] [-w]
           [--] <file>
 ```
 </details>
-
-The [git blame] command show the commit, when and who last modified each line of a file.
 
 <details><summary>🚧Let's practice</summary>
 
@@ -625,6 +618,8 @@ git annotate lorem_ipsum.txt
 ### 2.6 Stashing
 ![](resources/icons/stash.png)
 
+The [git stash] command saves our working changes into a "temporal commit".
+
 <details><summary>ℹ️⚡ℹ️ Synopsis</summary>
 
 ```bash
@@ -640,8 +635,6 @@ git stash clear
 git stash create [<message>]
 ```
 </details>
-
-The [git stash] command saves our working changes into a "temporal commit".
 
 <details><summary>🚧Let's practice</summary>
 
@@ -707,6 +700,9 @@ git stash show -p
 ### 2.7 Rollback changes
 ![](resources/icons/rollback.png)
 
+The [git revert] command takes back the modifications made by some commit or commits.
+It also discards added changes (we have been used this command as the `unstage` alias).
+
 <details><summary>ℹ️⚡ℹ️ Synopsis</summary>
 
 ```bash
@@ -715,8 +711,9 @@ git revert (--continue | --skip | --abort | --quit)
 ```
 </details>
 
-The [git revert] command takes back the modifications made by some commit or commits.
-It also discards added changes (we have been used this command as the `unstage` alias).
+The [git reset] command repositions our HEAD to the given reference.
+
+⚠️ This command rewrites the git history, so be careful when using it.
 
 <details><summary>ℹ️⚡ℹ️ Synopsis</summary>
 
@@ -725,9 +722,6 @@ git reset [--patch | -p] [<tree-ish>] [--] [<pathspec>...]
 git reset [--soft | --mixed | --hard] [<commit>]
 ```
 </details>
-
-The [git reset] command repositions our HEAD to the given reference.
-⚠️ This command rewrites the git history, so be careful when using it.
 
 ```mermaid
 stateDiagram-v2
@@ -837,6 +831,7 @@ git logtree
 ![](resources/icons/amend.png)
 
 Previously we saw the [git commit] command, but there is an argument that needs a special mention: `amend`.
+
 ⚠️ This argument rewrites the last commit, so, as other commands that rewrites the git history, be careful.
 Anyway, this option let us clean our git history if we see something wrong or to improve.
 
@@ -869,6 +864,10 @@ git log --pretty=fuller -n 2
 ### 2.9 Cherry picking
 ![](resources/icons/cherrypick.png)
 
+The [git cherry-pick] command copies other commit or commits.
+This is useful when you, or someone else, have something useful in other branch,
+and you need it, but you don't need the whole branch.
+
 <details><summary>ℹ️⚡ℹ️ Synopsis</summary>
 
 ```bash
@@ -876,10 +875,6 @@ git cherry-pick [--edit] [-n | --no-commit] [-x] [--ff] <commit>...
 git cherry-pick (--continue | --skip | --abort | --quit)
 ```
 </details>
-
-The [git cherry-pick] command copies other commit or commits.
-This is useful when you, or someone else, have something useful in other branch,
-and you need it, but you don't need the whole branch.
 
 ```mermaid
 flowchart BT
@@ -942,6 +937,8 @@ git config user.name "Eduardo Ruiz"
 ### 2.10 Branch integration (merge & rebase)
 ![](resources/icons/branch_compare.png)
 
+The [git merge] command joins two or more branches. Usually, you will only see a merge from two branches.
+If we take a "deep" look to the merge commits you will se that we have more than one parent.
 <details><summary>ℹ️⚡ℹ️ Synopsis</summary>
 
 ```bash
@@ -951,23 +948,21 @@ git merge (--continue | --abort | --quit)
 ```
 </details>
 
-The [git merge] command joins two or more branches. Usually, you will only see a merge from two branches.
-If we take a "deep" look to the merge commits you will se that we have more than one parent.
+The [git rebase] command move and/or manage a set of commits to another base.
+If we have a branches A & B(HEAD), it is like we create A' as temporal branch
+and take the commits from A, one by one, and apply a cherry-pick or amend over B,
+then delete A and rename A' to A.
+
+⚠️ This command rewrites the git history, so be careful.
 
 <details><summary>ℹ️⚡ℹ️ Synopsis</summary>
 
 ```bash
 git rebase [-i | --interactive] [--onto <newbase> | --keep-base]
-          [--no-ff] [<upstream> [<branch>] | <branch>]
+           [--no-ff] [<upstream> [<branch>] | <branch>]
 git rebase (--continue | --skip | --abort | --quit | --edit-todo | --show-current-patch)
 ```
 </details>
-
-The [git rebase] command move and/or manage a set of commits to another base.
-If we have a branches A & B(HEAD), it is like we create A' as temporal branch
-and take the commits from A, one by one, and apply a cherry-pick or amend over B,
-then delete A and rename A' to A.
-⚠️ This command rewrites the git history, so be careful.
 
 Initial
 ```mermaid
@@ -1119,6 +1114,11 @@ In this section we will see how to work in a team using git.
 
 ### 3.1 Cloning a remote repository
 
+The [git clone] command copies a repository into a new directory.
+Usually, the "remote" repository is called `origin`, but you can name it whatever you like.
+Probably you will only use this command to download a repo from a remote repository to your local computer,
+but it is also commonly used when you have to manage CI/CD[^CI/CD] pipelines.
+
 <details><summary>ℹ️⚡ℹ️ Synopsis</summary>
 
 ```bash
@@ -1128,11 +1128,6 @@ git clone [-v | --verbose] [-l | --local]
           [--] <repository> [<directory>]
 ```
 </details>
-
-The [git clone] command copies a repository into a new directory.
-Usually, the "remote" repository is called `origin`, but you can name it whatever you like.
-Probably you will only use this command to download a repo from a remote repository to your local computer,
-but it is also commonly used when you have to manage CI/CD[^CI/CD] pipelines.
 
 ```mermaid
 flowchart
@@ -1176,6 +1171,10 @@ git remote show origin
 > Let's create a Personal Token Access ([PAT]) following the official documentation.
 
 ### 3.2 Working with others 1 (fetching)
+
+The [git fetch] command syncs your local and remote repositories, so if new tags or branches have been created or updated,
+now will be visible and available to work with them.
+
 <details><summary>ℹ️⚡ℹ️ Synopsis</summary>
 
 ```bash
@@ -1185,9 +1184,6 @@ git fetch [--all] [-v | --verbose]
          [<repository> [<refspec>...]]
 ```
 </details>
-
-The [git fetch] command syncs your local and remote repositories, so if new tags or branches have been created or updated,
-now will be visible and available to work with them.
 
 <details><summary>🚧Let's practice</summary>
 
@@ -1216,6 +1212,11 @@ Let's stop here, for now. Add this alias, and we will see how it works later.
 > 🎁♻️ **_Cool alias:_** Not valid for current branch `git config --global alias.sync = fetch origin main:main`
 
 ### 3.3 Working with others 2 (pull-push)
+The [git pull] command is used to sync and download content from a remote repository.
+Under the hood, `git pull` is a making the following steps for you:
+1. [git fetch]: Sync local & remote repo histories scoped to the local branch that `HEAD` is pointed at
+2. [git merge] / [git rebase]: Git will reconcile the diverging branches (local/remote), if needed
+
 <details><summary>ℹ️⚡ℹ️ Synopsis</summary>
 
 ```bash
@@ -1226,11 +1227,6 @@ git pull [--tags] [-v | --verbose]
          [<repository> [<refspec>...]]
 ```
 </details>
-
-The [git pull] command is used to sync and download content from a remote repository.
-Under the hood, `git pull` is a making the following steps for you:
-1. [git fetch]: Sync local & remote repo histories scoped to the local branch that `HEAD` is pointed at
-2. [git merge] / [git rebase]: Git will reconcile the diverging branches (local/remote), if needed
 
 So let's say you have cloned some time ago a repo, you are at main but your team have been working on this repo (and you didn't).
 Your main branch will be behind several commits. If you perform a `git pull` command it will `fetch` + `rebase` your main branch:
@@ -1351,6 +1347,9 @@ git pull origin testing3
 ```
 </details><br>
 
+The [git push] command sends your local tracked changes to your remote/s.
+This means, it updates the remote repository to match your local repository (the branch or tag you are pushing).
+
 <details><summary>ℹ️⚡ℹ️ Synopsis</summary>
 
 ```bash
@@ -1359,9 +1358,6 @@ git push [--tags] [--porcelain] [-v | --verbose]
          [<repository> [<refspec>...]]
 ```
 </details>
-
-The [git push] command sends your local tracked changes to your remote/s.
-This means, it updates the remote repository to match your local repository (the branch or tag you are pushing).
 
 Before git push
 ```mermaid
@@ -1423,6 +1419,16 @@ When you fork a repository you are, in fact, cloning it, but not to your local m
 But, why to do so? There might be several reasons to fork, or not to fork, but the main reason could be to manage
 the contributions without a complex permission management.
 
+Imagine you are the one who owns a repository, and it is not private, as you want people to help you by contributing.
+You will need to wait until someone reaches you, then you will grant access, but only to do certain things
+(you do not want anyone to delete your code, or to grant other people access).
+After a few years you have many people helping you, with different roles, some of them are not contributing anymore, so you should remove them...
+And what it is worst, each one of them have between 1 and 5 branches, some of them are up-to-date, other ones are not, others simply are tests...
+How would you clean up your repository?
+With a fork-based develop you don't need to. You simply make your repo accessible to the people you may want, and they will fork it (server-side clone).
+Those people will not have permission (or at least they shouldn't) to push or manages your repo, they will manage theirs, so if anyone wants to create a million of branches, they can do it without messing with your repository.
+When someone develops a feature that wants to be integrated into the "main" code, that person will create a PR[^PR] and you (or your team) will accept or reject it.
+
 ```mermaid
 flowchart
    origin[(origin)]
@@ -1433,6 +1439,17 @@ flowchart
    origin <-- fetch\npull\npush --> pepe
    origin <-- fetch\npull\npush --> ana
 ```
+
+When you work with forks you have to think that you are working with (at least) 3 repositories at the same time,
+each one of them have their own history and restrictions:
+1. The main repository, from where you created your fork.
+   * You will have to clone this repository to your local, this remote is usually called `upstream`
+   * Probably you won't be granted to do almost anything
+2. Your forked repository, which it is a perfect copy, but it will be managed by yourself
+   * You will have to clone this repository too, this one is usually called `origin`, as if it were a normal clone
+   * You can do anything you want here (grant/restrict access to anyone, delete the repo, etc.)
+3. Your local repository
+
 ```mermaid
 flowchart
    upstream[(upstream)]
@@ -1455,6 +1472,23 @@ flowchart
    orig2 -- PR --> upstream
    orig3 -- PR --> upstream
 ```
+
+To sum up, you will usually have to do the following steps if you are working in a fork-based team:
+1. Fork the "main" repo to your personal server-side space.
+2. Clone your forked repo as `origin`
+3. Clone the "main" repo as `upstream`
+4. Manage your local branches (not necessary, but recommended):
+   * Delete the branches you don't want, if there are any.
+   * Change your "main" branches (master/main/develop) so their remotes are the `upstream` repository,
+     * if you don't do this, when you pull a branch it will be pulling it from your `origin`, instead of `upstream`(which is the one everybody is contributing at)
+     * you may not do this, if you specify where to pull from but...
+     * why to keep your `origin` branches up to date when you are not using them? If you create a feature is a new branch, this one should be up-to-date, but not the rest of them
+5. Create a new branch from `upstream`
+6. Commit, merge, rebase or do anything you need to develop your feature
+7. Push your branch to your fork (`origin`)
+8. Create a pull request from `origin/your_branch` to `upstream/main_or_develop_branch`
+9. The PR[^PR] gets approved and merged or changes will be requested (go to step 6, skip 8, as the PR[^PR] will be automatically updated)
+
 ```mermaid
 flowchart
    upstream[(upstream)]
@@ -1478,43 +1512,6 @@ flowchart
    orig3 --> upstream
    orig2 <-- fetch\npull\npush --> edu
 ```
-
-Imagine you are the one who owns a repository, and it is not private, as you want people to help you by contributing.
-You will need to wait until someone reaches you, then you will grant access, but only to do certain things
-(you do not want anyone to delete your code, or to grant other people access).
-After a few years you have many people helping you, with different roles, some of them are not contributing anymore, so you should remove them...
-And what it is worst, each one of them have between 1 and 5 branches, some of them are up-to-date, other ones are not, others simply are tests...
-How would you clean up your repository?
-With a fork-based develop you don't need to. You simply make your repo accessible to the people you may want, and they will fork it (server-side clone).
-Those people will not have permission (or at least they shouldn't) to push or manages your repo, they will manage theirs, so if anyone wants to create a million of branches, they can do it without messing with your repository.
-When someone develops a feature that wants to be integrated into the "main" code, that person will create a PR[^PR] and you (or your team) will accept or reject it.
-
-When you work with forks you have to think that you are working with (at least) 3 repositories at the same time,
-each one of them have their own history and restrictions:
-1. The main repository, from where you created your fork.
-   * You will have to clone this repository to your local, this remote is usually called `upstream`
-   * Probably you won't be granted to do almost anything
-2. Your forked repository, which it is a perfect copy, but it will be managed by yourself
-   * You will have to clone this repository too, this one is usually called `origin`, as if it were a normal clone
-   * You can do anything you want here (grant/restrict access to anyone, delete the repo, etc.)
-3. Your local repository
-
-To sum up, you will usually have to do the following steps if you are working in a fork-based team:
-1. Fork the "main" repo to your personal server-side space.
-2. Clone your forked repo as `origin`
-3. Clone the "main" repo as `upstream`
-4. Manage your local branches (not necessary, but recommended):
-   * Delete the branches you don't want, if there are any.
-   * Change your "main" branches (master/main/develop) so their remotes are the `upstream` repository,
-     * if you don't do this, when you pull a branch it will be pulling it from your `origin`, instead of `upstream`(which is the one everybody is contributing at)
-     * you may not do this, if you specify where to pull from but...
-     * why to keep your `origin` branches up to date when you are not using them? If you create a feature is a new branch, this one should be up-to-date, but not the rest of them
-5. Create a new branch from `upstream`
-6. Commit, merge, rebase or do anything you need to develop your feature
-7. Push your branch to your fork (`origin`)
-8. Create a pull request from `origin/your_branch` to `upstream/main_or_develop_branch`
-9. The PR[^PR] gets approved and merged or changes will be requested (go to step 6, skip 8, as the PR[^PR] will be automatically updated)
-
 <details><summary>🚧Let's practice</summary>
 
 ```bash

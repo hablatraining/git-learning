@@ -304,28 +304,49 @@ git log
 The [git log] command shows the git commit history.
 This command is highly customizable, you can limit the number of commits, select a range, show it like a tree format, etc.
 
+We will also see how to create aliases using the [git config] command.
+Git aliases are very useful if you are using the command line, because you will no longer need to remember some arguments or complicate command.
+For example, if you usually use `git status -u -s -b` you may forget some argument or just type a bit less adding an alias called `stat`.
+After you create that alias, you will simply type `git stat`, and git, under the hood, will execute your command.
+We can create global aliases (affects to all repos) and local aliases (affects to your current repo, and will be used instead of the global alias if there are conflicts)
+
 <details><summary>🚧Let's practice</summary>
 
 ```bash
-echo "Something" >> README.md
-git add .
+# We will add some alias to begin with, so it will ease our life (ignore the commands, for now)
 git config --global alias.unstage 'reset --'
 git config --global alias.discard 'checkout --'
 git config --global alias.st 'status --short --branch --untracked-files=all --ignored'
 
+echo "Something" >> README.md
+git add .
 git st
 git unstage README.md
 git st
 git discard README.md
 git st
+# Now we are creating a local alias, available only for this repo
+# As we have the same alias globally, this one will overwrite the global one
+git config alias.st 'status --short --branch --untracked-files=all --ignored'
+git st
+# We can remove an alias (or overwrite it)
+git config --unset alias.st
+# As we removed our local alias, we will be able to use the global one again
+git st
 
+# Now let's see the git log to see the last commits we made
 git log
+# Several options could be added to customize your log, but I find this one useful, which will show you the specified number of commits
 git log -n 1
+# Here there is an example of a git log that shows it to you like a tree, not only your current branch, but every branch
+git log --graph --abbrev-commit --decorate --format=format:'%C(bold blue)%h%C(reset) - %C(bold cyan)(%ar|%cr)%C(reset) %C(bold yellow)%d%C(reset) %C(white)%s%C(reset) %C(dim green)- %an%C(reset)' --all
+# This command is the perfect example to think about aliases. It is a very large and complex command we do not want to remember or type again
 git config --global alias.logtree "log --graph --abbrev-commit --decorate --format=format:'%C(bold blue)%h%C(reset) - %C(bold cyan)(%ar|%cr)%C(reset) %C(bold yellow)%d%C(reset) %C(white)%s%C(reset) %C(dim green)- %an%C(reset)' --all"
 git logtree
 ```
 </details>
 
+Sometimes from now on you will see a section like this, so you can keep some useful aliases handy.
 > 🎁♻️ **_Cool alias:_** `git config --global alias.unstage 'reset --'`<br>
 > 🎁♻️ **_Cool alias:_** `git config --global alias.discard 'checkout --'`<br>
 > 🎁♻️ **_Cool alias:_** `git config --global alias.untrack 'rm --cached'`<br>
@@ -1116,6 +1137,9 @@ git logtree
 ![](resources/icons/github.png)![](resources/icons/gitlab.png)![](resources/icons/bitbucket.png)
 
 In this section we will see how to work in a team using git.
+A remote repository is a server-side repository, which we might think of it as the "official" repository.
+Working in a team can be a little tricky.
+We do not only have to worry about our local repository and how we integrate our features into the "official" repo, but also the others features and integrations.
 
 ### 3.1 Cloning a remote repository
 
@@ -1166,7 +1190,7 @@ Let's clone this very same repo and see the firsts commands we can use while wor
 cd ~/projects
 git clone https://github.com/eruizalo/git-learning.git
 cd git-learning
-# How can I see where I cloned this repo?
+# How can I see from where I cloned this repo?
 git remote
 # Let's see a bit more
 git remote show origin
@@ -1397,7 +1421,7 @@ Under the hood, it is a simple merge, but this feature provides useful tools you
 5. Let our teammates collaborate and learn from our code (and we could learn from them)
 6. There is an option that let us delete our branch after the merge (probably this branch is no longer useful) so we have a clean repository.
 
-**Best practices**:
+**Best practices** 👍:
 * You can create Pull Request templates if you are using [GitHub](https://docs.github.com/en/enterprise-server@3.3/communities/using-templates-to-encourage-useful-issues-and-pull-requests/creating-a-pull-request-template-for-your-repository) or [GitLab](https://docs.gitlab.com/ee/user/project/description_templates.html)
 * Label your PR and add reviewers.
 * Add a PR summary that helps other people what are you trying to merge

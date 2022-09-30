@@ -90,6 +90,9 @@ Now, inside your docker, got to **projects/local** folder: `cd projects/local`
 ### 2.1 Starting with git
 ![](resources/icons/config.png)
 
+We will see the following commands to begin with git:
+1. The [git config] command let us add, remove and show some configurations to customize the way you work with git.
+
 <details><summary>ℹ️⚡ℹ️ Synopsis</summary>
 
 ```bash
@@ -101,9 +104,7 @@ git config [--<scope>] -e | --edit
 ```
 </details>
 
-The [git config] command let us add, remove and show some configurations to customize the way you work with git.
-We will also see the following commands to begin with git:
-1. The [git init] command creates an empty local git repository. An initial branch without any commits and `.git` folder will be created, where the local git config will be saved.
+2. The [git init] command creates an empty local git repository. An initial branch without any commits and `.git` folder will be created, where the local git config will be saved.
 
 <details><summary>ℹ️⚡ℹ️ Synopsis</summary>
 
@@ -113,7 +114,7 @@ git init [-b <branch-name> | --initial-branch=<branch-name>]
 ```
 </details>
 
-2. The [git add] command updates the internal git index so the given files will be tracked and prepared to be "committed". A file that has being "added" is also known as a staged file.
+3. The [git add] command updates the internal git index so the given files will be tracked and prepared to be "committed". A file that has being "added" is also known as a staged file.
 
 <details><summary>ℹ️⚡ℹ️ Synopsis</summary>
 
@@ -177,6 +178,8 @@ git config user.name "Eduardo Ruiz"
 git config --list --show-origin
 ```
 </details>
+
+Now that you know what a commit is you might want to take a look about [Conventional Commits specification]. This is just a convention and may be used or differ from project to project.
 
 ### 2.2 Tracking files
 ![](resources/icons/track.png)
@@ -358,6 +361,13 @@ Sometimes from now on you will see a section like this, so you can keep some use
 ### 2.4 HEAD, relative references & branch creation and repositioning
 ![](resources/icons/branch.png)
 
+#### What are the git branches & HEAD?
+
+A branch in git is a pointer git use to reference a commit.
+Every git repo has at least one branch (usually main or master).
+Everytime you create a new commit, your branch pointer moves forward to reference the new commit.
+Any time you want to develop a new feature or create a fix, you should create a new branch, so you will be able to develop and test your changes without affecting the original code.
+
 <details><summary>ℹ️⚡ℹ️ Synopsis</summary>
 
 ```bash
@@ -389,6 +399,9 @@ The [git checkout] command let us move between branches and restore files (disca
 In git, you are always somewhere in the git history. That means, you are always seeing a commit, in the git history.
 **HEAD** is the pointer to the current commit you are viewing. Every time you switch from one branch to another,
 your **HEAD** moves from one branch to the other.
+
+
+#### Relative positioning
 
 Now we know the concept of branch & HEAD, we will see how to switch from/to them.
 But what if I want to position git to two commits before "main"? Do I need to show the log
@@ -500,7 +513,7 @@ git logtree
 # We can also create branches from relative positions
 git checkout main
 git branch -f ref HEAD~1
-git branch -f refParen1 main^1
+git branch -f refParen1 main^1 ## TODO REVISAR ESTO PORQUE NO ES SOBRE MAIN
 git branch -f refParen2 main^2
 git logtree
 
@@ -722,6 +735,8 @@ git stash list
 git stash drop stash@{0}
 # If we do not specify any stash, it will use the last one (stash@{0})
 git stash show -p
+#######
+
 ```
 </details>
 
@@ -821,7 +836,7 @@ git revert reverts~2
 git diff HEAD
 # In this case we will abort the revert
 git revert --abort
-
+#### OJO QUE NO FUNCIONA BIEN CON LAS REFERENCIAS
 # We have other ways to "fix" our git history. Here we will see reset command, but,
 #     unlike the revert command, which creates a new commit, reset goes back in history
 #     and we have different ways to do so
@@ -1092,6 +1107,7 @@ echo "Some class" > MyClass.scala
 git add .
 git commit -m "some class"
 git merge --no-ff feature/myOtherFeature
+# TODO ver resolución de conflictos
 git merge --abort
 
 # Another interesting argument is squash. This allow us to consolidate all our
@@ -1184,6 +1200,10 @@ git remote [-v | --verbose] show [-n] <name>...
 ```
 </details>
 
+These are no complex commands, but it is good to know some perks about them to ease your daily life, specially when working with forks (we will see them later):
+
+<details><summary>🚧Let's practice</summary>
+
 Let's clone this very same repo and see the firsts commands we can use while working int a team.
 
 ```bash
@@ -1192,26 +1212,40 @@ git clone https://github.com/eruizalo/git-learning.git
 cd git-learning
 # How can I see from where I cloned this repo?
 git remote
+git remote -v
 # Let's see a bit more
 git remote show origin
+cd ..
+rm -rf git-learning
+git clone https://github.com/hablatraining/git-learning.git --origin upstream
+cd git-learning
+git remote add origin https://github.com/eruizalo/git-learning.git
+git remote -v
 ```
 
-> ⚠️⚠️ **GitHub support for password authentication was removed on August 13, 2021.**:
-> Let's create a Personal Token Access ([PAT]) following the official documentation.
+</details>
 
 ### 3.2 Working with others 1 (fetching)
+
+> ⚠️⚠️ **GitHub support for password authentication was removed on August 13, 2021.**:
+> 
+> Let's create a Personal Token Access ([PAT]) following the official documentation: You will create a temporal password only for this.
+> 
+> You may authenticate using [SSH] as well: You will create a pair of private & public keys, with or without password, it depends on how you configure it.
+
 <details><summary>ℹ️⚡ℹ️ Synopsis</summary>
 
 ```bash
-git fetch [--all] [-v | --verbose]
-         [--no-commit] [-e | --edit] [--ff-only]
-         [--squash] [--autostash]
-         [<repository> [<refspec>...]]
+git fetch [--all] [-p | --prune] [-P | --prune-tags] [-n | --no-tags] [-v | --verbose] [<repository> [<refspec>...]]
+git fetch [-f | --force] [<repository>] <src>:<dst>
+          
 ```
 </details>
 
 The [git fetch] command syncs your local and remote repositories, so if new tags or branches have been created or updated,
 now will be visible and available to work with them.
+
+This command will download new content from your remote repository, but it will leave your current workspace as it is. If you want to get fetched content, you will have to check it out using [git checkout] command.
 
 <details><summary>🚧Let's practice</summary>
 
@@ -1237,7 +1271,7 @@ git fetch   # Here we also can see updated branches
 
 Let's stop here, for now. Add this alias, and we will see how it works later.
 
-> 🎁♻️ **_Cool alias:_** Not valid for current branch `git config --global alias.sync = fetch origin main:main`
+> 🎁♻️ **_Cool alias:_** Not valid for current branch `git config --global alias.sync 'fetch origin main:main'`
 
 ### 3.3 Working with others 2 (pull-push)
 <details><summary>ℹ️⚡ℹ️ Synopsis</summary>
@@ -1407,7 +1441,31 @@ flowchart LR
 <details><summary>🚧Let's practice</summary>
 
 ```bash
+git checkout -b push-${name}
+echo "push" > push.txt
+git add push.txt
+git commit -m "push 1"
+# This will crash
 git push
+# As we do not have yet a default remote, we could:
+#   1. use the hint git gave us (from now on, the default remote will be origin)
+#   2. specify where to push. We will do this one
+git push origin push-${name}
+# There is no much more to see about push, but things get complicated here...
+# What if more than one person is working on the same branch?
+# What if someone else pushed before me?
+
+# The next command will show a simulate scenario similar to what you will see if this happens
+git commit --amend -m "push 2"
+# When we try tu push the "new" commit git warn us saying there are commits to be downloaded first
+git push origin push-${name}
+
+# Now we have to decide:
+#   Our work is what is correct?
+#     Then we have to force a push, deleting whatever it is in the remote
+#   I need to download the remote content before, because it is useful or I need it
+#     We should rebase/merge our content
+git push --force origin push-${name}
 ```
 </details>
 
@@ -1447,6 +1505,47 @@ When you fork a repository you are, in fact, cloning it, but not to your local m
 But, why to do so? There might be several reasons to fork, or not to fork, but the main reason could be to manage
 the contributions without a complex permission management.
 
+#### How forking usually works. Simple picture
+<table>
+<td>
+
+1. Clone from upstream and add you origin as remote (or vice-versa)
+2. Whenever you have some feature or fix, you will push it to **origin** ✅ (upstream ❌)
+3. After you push a finished branch, you will create a PR: origin &rarr; upstream
+4. From time to time, you may want/will have to sync your work and the primary repo (upstream). Then you have to fetch + pull from upstream
+5. If, and only if, you want to get synced your origin and upstream you will push the pulled branches (usually main/master)
+
+</td><td>
+
+```mermaid
+flowchart LR
+   subgraph server-side [ ]
+      upstream[(upstream)]
+      origin[(origin)]
+   end
+   local[[local]]
+   origin -- PR --> upstream
+   local -- push --> origin
+   upstream -- fetch\npull --> local
+```
+</td>
+</table>
+
+If we have to take a mental picture super synthesized, this would be it:
+
+| command | origin | upstream |
+|:-------:|:------:|:--------:|
+|  fetch  |   ❌    |    ✅     |
+|  pull   |   ❌    |    ✅     |
+|  push   |   ✅    |    ❌     |
+
+#### Real scenario
+Probably you will work in a team, each and one of them will have their own fork, and you can interact with their forks the same way you interact with yours (if you are allowed to)
+<table>
+<th>no forks</th>
+<th>forks</th>
+<tr><td>
+
 ```mermaid
 flowchart
    origin[(origin)]
@@ -1456,7 +1555,11 @@ flowchart
    origin <-- fetch\npull\npush --> edu
    origin <-- fetch\npull\npush --> pepe
    origin <-- fetch\npull\npush --> ana
+
 ```
+</td>
+<td>
+
 ```mermaid
 flowchart
    upstream[(upstream)]
@@ -1479,6 +1582,9 @@ flowchart
    orig2 -- PR --> upstream
    orig3 -- PR --> upstream
 ```
+</td></tr>
+</table>
+
 ```mermaid
 flowchart
    upstream[(upstream)]
@@ -1569,7 +1675,9 @@ git push
 
 [docker]: https://docs.docker.com/get-docker/
 [mermaid]: https://mermaid-js.github.io/
+[Conventional Commits Specification]: https://www.conventionalcommits.org/en/v1.0.0/
 [PAT]: https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/creating-a-personal-access-token
+[SSH]: https://docs.github.com/en/authentication/connecting-to-github-with-ssh
 
 [git glossary]: https://www.git-scm.com/docs/gitglossary
 [git config]: https://git-scm.com/docs/git-config
